@@ -40,7 +40,7 @@ export default function Authentication({ formType }) {
 
             if (formState === 1) {
                 const msg = await handleRegister(name, username, password, email); // ✅ get returned message
-                setMessage(msg || "Registration successful!");
+                setMessage(msg || "A verification link has been sent to your email.");
                 setError("");
                 setOpen(true);
                 setFormState(0);

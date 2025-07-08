@@ -1,6 +1,11 @@
 const UsersModel = require("../models/UsersModel.js");
-const { createSecretToken } = require("../utils/secretToken.js");
+const {
+  createSecretToken,
+  emailVerificationToken,
+} = require("../utils/secretToken.js");
 const bcrypt = require("bcrypt");
+const { sendEmail } = require("../utils/sendEmail.js");
+const jwt = require("jsonwebtoken");
 
 module.exports.Signup = async (req, res, next) => {
   try {
@@ -15,15 +20,19 @@ module.exports.Signup = async (req, res, next) => {
       username,
       createdAt,
     });
-    const token = createSecretToken(user._id); // Create a JWT token using the user's ID
-    // Store the token in browser cookies
-    res.cookie("token", token, {
-      withCredentials: true, // allows frontend to send/receive cookies
-      httpOnly: false, // not restricting access to client-side JS
+
+    const verificationToken = emailVerificationToken(user._id);
+    const verificationUrl = `http://localhost:5173/verifyemail?token=${verificationToken}`;
+    await sendEmail(
+      user.email,
+      "Verify your PizzaForge account",
+      `<a href="${verificationUrl}">Click here to verify your account</a>`
+    );
+    res.status(201).json({
+      message: "User signed up successfully, Verification Email Sent",
+      success: true,
+      user,
     });
-    res
-      .status(201)
-      .json({ message: "User signed in successfully", success: true, user });
     next();
   } catch (error) {
     console.error(error);
@@ -40,6 +49,12 @@ module.exports.Login = async (req, res, next) => {
     if (!user) {
       return res.json({ message: "Incorrect password or email" });
     }
+    if (!user.verified) {
+      return res.json({
+        message: "Please verify your email before logging in.",
+      });
+    }
+
     // Compare entered password with hashed password in DB
     const auth = await bcrypt.compare(password, user.password);
     if (!auth) {
@@ -58,5 +73,23 @@ module.exports.Login = async (req, res, next) => {
     next();
   } catch (error) {
     console.error(error);
+  }
+};
+
+module.exports.VerifyEmail = async (req, res) => {
+  const token = req.query.token;
+  if (!token) {
+    return res.json({ status: false });
+  }
+  try {
+    const decoded = jwt.verify(token, process.env.EMAIL_SECRET);
+
+    const user = await UsersModel.findByIdAndUpdate(decoded.id, {
+      verified: true,
+    });
+
+    if (user) return res.json({ status: true, user: user.username });
+  } catch (error) {
+    return res.json({ status: false });
   }
 };

@@ -19,6 +19,10 @@ const UsersSchema = new Schema({
     type: Date,
     default: new Date(),
   },
+  verified: {
+    type: Boolean,
+    default: false,
+  },
 });
 
 // Mongoose Middleware - runs **before saving** a user to the database

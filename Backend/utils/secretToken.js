@@ -9,3 +9,15 @@ module.exports.createSecretToken = (id) => {
     expiresIn: 3 * 24 * 60 * 60,
   });
 };
+
+module.exports.emailVerificationToken = (id) => {
+  return jwt.sign({ id }, process.env.EMAIL_SECRET, {
+    expiresIn: "1h", // Short-lived
+  });
+};
+
+module.exports.createResetToken = (id) => {
+  return jwt.sign({ id }, process.env.RESET_SECRET, {
+    expiresIn: "10m",
+  });
+};
