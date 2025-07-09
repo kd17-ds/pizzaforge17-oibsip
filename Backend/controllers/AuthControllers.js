@@ -2,6 +2,7 @@ const UsersModel = require("../models/UsersModel.js");
 const {
   createSecretToken,
   emailVerificationToken,
+  createResetToken,
 } = require("../utils/secretToken.js");
 const bcrypt = require("bcrypt");
 const { sendEmail } = require("../utils/sendEmail.js");
@@ -91,5 +92,52 @@ module.exports.VerifyEmail = async (req, res) => {
     if (user) return res.json({ status: true, user: user.username });
   } catch (error) {
     return res.json({ status: false });
+  }
+};
+
+module.exports.ForgotPass = async (req, res) => {
+  const { email } = req.body;
+  try {
+    const user = await UsersModel.findOne({ email });
+    if (!user) {
+      return res.json({ message: "No User exists with the email" });
+    }
+
+    const token = createResetToken(user._id);
+    const resetPassUrl = `http://localhost:5173/forgotpass?token=${token}`;
+    await sendEmail(
+      user.email,
+      "Reset Your Password - PizzaForge",
+      `<p>Click below to reset your password:</p>
+     <a href="${resetPassUrl}">Reset Password</a>`
+    );
+
+    res.json({ message: "Password reset email sent" });
+  } catch (error) {
+    return res.json({ status: false });
+  }
+};
+
+module.exports.ResetPass = async (req, res) => {
+  const token = req.query.token;
+  if (!token) {
+    return res.json({ status: false });
+  }
+  try {
+    const allowReset = jwt.verify(token, process.env.RESET_SECRET);
+    const { password } = req.body;
+
+    const hashedPassword = await bcrypt.hash(password, 12);
+    const updatedUser = await UsersModel.findByIdAndUpdate(allowReset.id, {
+      password: hashedPassword,
+    });
+
+    if (updatedUser) {
+      return res.json({ message: "Password changed successfully" });
+    } else {
+      return res.json({ message: "User not found" });
+    }
+  } catch (error) {
+    return res.json({ status: false, message: "Token expired or invalid" });
   }
 };

@@ -6,6 +6,7 @@ import MainLayout from './layout/MainLayout'
 import HomePage from './pages/HomePage';
 import { AuthProvider } from './contexts/AuthContext';
 import VerifyEmail from './pages/VerifyEmail';
+import ForgotPass from './pages/ForgotPass';
 
 function App() {
   return (
@@ -16,6 +17,7 @@ function App() {
           <Route path="/login" element={<Authentication formType="login" />} />
           <Route path="/signup" element={<Authentication formType="signup" />} />
           <Route path="/verifyemail" element={<VerifyEmail />} />
+          <Route path="/forgotpass" element={<ForgotPass />} />
         </Route>
       </Routes>
     </AuthProvider>

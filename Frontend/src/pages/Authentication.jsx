@@ -3,6 +3,8 @@ import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 import { useNavigate, useLocation } from "react-router-dom";
 import { Snackbar } from "@mui/material";
 import { AuthContext } from "../contexts/AuthContext";
+import { BASE_URL } from "../constants/constants";
+import axios from 'axios';
 
 export default function Authentication({ formType }) {
     const [username, setUsername] = useState("");
@@ -28,6 +30,21 @@ export default function Authentication({ formType }) {
         setFormState(state);
         navigate(state === 0 ? "/login" : "/signup");
     };
+
+    const passChange = async () => {
+        if (!email) {
+            setError("Please enter your email to reset password.");
+            return;
+        }
+        try {
+            const res = await axios.post(`${BASE_URL}/forgotpass`, { email });
+            setMessage(res.data.message || "Reset link sent to your email");
+            setOpen(true);
+            setError("");
+        } catch (err) {
+            setError(err.message || "Something went wrong.");
+        }
+    }
 
     const handleAuth = async () => {
         try {
@@ -113,6 +130,18 @@ export default function Authentication({ formType }) {
                             className="w-full border border-gray-300 rounded px-3 py-2"
                             required
                         />
+
+                        {formState === 0 && (
+                            <div className="w-full text-left">
+                                <button
+                                    type="button"
+                                    className="text-blue-600 text-sm hover:underline"
+                                    onClick={passChange}
+                                >
+                                    Forgot Password?
+                                </button>
+                            </div>
+                        )}
 
                         {error && <p className="text-red-600 text-sm">{error}</p>}
 
