@@ -12,6 +12,7 @@ const bodyParser = require("body-parser");
 const cookieParser = require("cookie-parser");
 const cors = require("cors");
 const authRoute = require("./routes/AuthRoutes");
+const pizzaRoute = require("./routes/PizzasRoutes");
 
 app.use(express.static(path.join(__dirname, "client", "dist"))); // Serve frontend static files (like React build)
 app.set("trust proxy", 1); // For trusting proxies (like when deployed on Render, Vercel, etc.)
@@ -29,6 +30,7 @@ app.use(bodyParser.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 app.use("/", authRoute);
+app.use("/pizzas", pizzaRoute);
 
 main()
   .then((res) => {
