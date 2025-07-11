@@ -23,6 +23,10 @@ const UsersSchema = new Schema({
     type: Boolean,
     default: false,
   },
+  isAdmin: {
+    type: Boolean,
+    default: false,
+  },
 });
 
 // Mongoose Middleware - runs **before saving** a user to the database

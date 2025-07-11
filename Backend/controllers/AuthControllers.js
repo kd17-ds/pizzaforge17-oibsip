@@ -62,16 +62,24 @@ module.exports.Login = async (req, res, next) => {
       return res.json({ message: "Incorrect password or email" });
     }
     // If password is correct, create a token
-    const token = createSecretToken(user._id);
+    const token = createSecretToken(user._id, user.isAdmin);
     // Set the token in cookie
     res.cookie("token", token, {
       withCredentials: true,
-      httpOnly: false,
+      httpOnly: true,
+      sameSite: "Lax",
     });
-    res
-      .status(201)
-      .json({ message: "User logged in successfully", success: true });
-    next();
+    res.status(201).json({
+      message: "User logged in successfully",
+      success: true,
+      user: {
+        id: user._id,
+        username: user.username,
+        email: user.email,
+        isAdmin: user.isAdmin,
+        secure: process.env.NODE_ENV === "production",
+      },
+    });
   } catch (error) {
     console.error(error);
   }

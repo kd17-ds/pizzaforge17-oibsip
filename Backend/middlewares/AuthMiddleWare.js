@@ -20,3 +20,25 @@ module.exports.userVerification = (req, res) => {
     }
   });
 };
+
+module.exports.isAdmin = async (req, res, next) => {
+  try {
+    const token = req.cookies.token;
+    if (!token) {
+      return res
+        .status(401)
+        .json({ message: "Access denied. No token provided." });
+    }
+
+    const decoded = jwt.verify(token, process.env.TOKEN_KEY);
+
+    if (!decoded.isAdmin) {
+      return res.status(403).json({ message: "Access denied. Not an admin." });
+    }
+
+    next();
+  } catch (err) {
+    console.error("Admin check error:", err);
+    res.status(401).json({ message: "Invalid token or unauthorized." });
+  }
+};

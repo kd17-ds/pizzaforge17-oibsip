@@ -5,10 +5,11 @@ const {
   DeletePizza,
   UpdatePizzaDetails,
 } = require("../controllers/PizzasControllers");
+const { isAdmin } = require("../middlewares/AuthMiddleWare");
 
-router.post("/addpizza", AddPizza);
-router.get("/updatepizza/:id", GetPizzaDetails);
-router.put("/updatepizza/:id", UpdatePizzaDetails);
-router.delete("/deletepizza/:id", DeletePizza);
+router.post("/addpizza", isAdmin, AddPizza);
+router.get("/updatepizza/:id", isAdmin, GetPizzaDetails);
+router.put("/updatepizza/:id", isAdmin, UpdatePizzaDetails);
+router.delete("/deletepizza/:id", isAdmin, DeletePizza);
 
 module.exports = router;

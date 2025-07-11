@@ -1,7 +1,7 @@
 export default function HomePage() {
     return (
         <div className="">
-            Hello
+            Hello user
         </div>
     );
 }
