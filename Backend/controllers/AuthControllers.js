@@ -69,7 +69,7 @@ module.exports.Login = async (req, res, next) => {
       httpOnly: true,
       sameSite: "Lax",
     });
-    res.status(201).json({
+    res.status(200).json({
       message: "User logged in successfully",
       success: true,
       user: {

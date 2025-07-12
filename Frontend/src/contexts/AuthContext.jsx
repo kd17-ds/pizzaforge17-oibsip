@@ -3,11 +3,13 @@ import axios from "axios";
 import httpStatus from "http-status";
 import { BASE_URL } from "../constants/constants";
 import { useNavigate } from "react-router-dom";
+import { jwtDecode } from "jwt-decode"
 
 export const AuthContext = createContext({});
 
 const client = axios.create({
     baseURL: `${BASE_URL}`,
+    withCredentials: true
 });
 
 export const AuthProvider = ({ children }) => {
@@ -34,18 +36,36 @@ export const AuthProvider = ({ children }) => {
 
     const handleLogin = async (email, password) => {
         try {
-            const res = await client.post("/login", {
-                email,
-                password,
-            });
+            const res = await client.post("/login", { email, password });
+            console.log("Login response:", res);
 
             if (res.status === httpStatus.OK) {
-                localStorage.setItem("token", res.data.token);
-                setUser(res.data.user);
-                return res.data.message;
+                // Extract token from cookie
+                const token = document.cookie
+                    .split("; ")
+                    .find((row) => row.startsWith("token="))
+                    ?.split("=")[1];
+
+                let tokenData = {};
+
+                if (token) {
+                    const decoded = jwtDecode(token);
+                    tokenData = { id: decoded.id, isAdmin: decoded.isAdmin };
+                }
+
+                const fullUser = {
+                    ...res.data.user,
+                    ...tokenData,
+                };
+
+                setUser(fullUser);
+                return { message: res.data.message, user: fullUser };
             }
+
+            return null;
         } catch (err) {
-            throw err;
+            console.error("Login error:", err);
+            return null;
         }
     };
 

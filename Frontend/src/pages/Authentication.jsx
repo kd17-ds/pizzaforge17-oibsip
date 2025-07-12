@@ -49,7 +49,18 @@ export default function Authentication({ formType }) {
     const handleAuth = async () => {
         try {
             if (formState === 0) {
-                const msg = await handleLogin(email, password); // ✅ get returned message
+                const result = await handleLogin(email, password);
+                console.log("Login result:", result);
+                if (!result) {
+                    setError("Login failed. Please try again.");
+                    return;
+                }
+                const { message: msg, user: loggedInUser } = result;
+                if (loggedInUser?.isAdmin) {
+                    navigate('/admin/home');
+                } else {
+                    navigate('/');
+                }
                 setMessage(msg || "Login successful!");
                 setError("");
                 setOpen(true);
