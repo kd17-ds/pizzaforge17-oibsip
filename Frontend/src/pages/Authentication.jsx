@@ -1,8 +1,8 @@
-import React, { useState, useEffect, useContext } from "react";
+import React, { useState, useEffect } from "react";
 import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 import { useNavigate, useLocation } from "react-router-dom";
 import { Snackbar } from "@mui/material";
-import { AuthContext } from "../contexts/AuthContext";
+import { useAuth } from "../hooks/useAuth";
 import { BASE_URL } from "../constants/constants";
 import axios from 'axios';
 
@@ -16,10 +16,9 @@ export default function Authentication({ formType }) {
     const [open, setOpen] = useState(false);
     const [email, setEmail] = useState("");
 
-
     const navigate = useNavigate();
     const location = useLocation();
-    const { handleRegister, handleLogin } = useContext(AuthContext);
+    const { handleRegister, handleLogin } = useAuth();
 
     useEffect(() => {
         if (location.pathname === "/signup") setFormState(1);

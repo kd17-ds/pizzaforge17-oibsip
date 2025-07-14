@@ -149,3 +149,31 @@ module.exports.ResetPass = async (req, res) => {
     return res.json({ status: false, message: "Token expired or invalid" });
   }
 };
+
+module.exports.VerifyUserFromCookie = async (req, res) => {
+  const token = req.cookies.token;
+  if (!token) {
+    return res.json({ status: false });
+  }
+
+  try {
+    const decoded = jwt.verify(token, process.env.TOKEN_KEY);
+    const user = await UsersModel.findById(decoded.id).select("-password");
+
+    if (!user) {
+      return res.json({ status: false });
+    }
+
+    res.json({
+      status: true,
+      user: {
+        id: user._id,
+        username: user.username,
+        email: user.email,
+        isAdmin: user.isAdmin,
+      },
+    });
+  } catch (err) {
+    return res.json({ status: false });
+  }
+};

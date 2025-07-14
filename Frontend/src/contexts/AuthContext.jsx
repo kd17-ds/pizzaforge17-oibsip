@@ -1,4 +1,4 @@
-import { createContext, useState } from "react";
+import { createContext, useState, useEffect } from "react";
 import axios from "axios";
 import httpStatus from "http-status";
 import { BASE_URL } from "../constants/constants";
@@ -12,9 +12,30 @@ const client = axios.create({
     withCredentials: true
 });
 
-export const AuthProvider = ({ children }) => {
+const AuthProvider = ({ children }) => {
     const [user, setUser] = useState(null);
     const navigate = useNavigate();
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        const verifyUser = async () => {
+            try {
+                const res = await client.get("/verifyUser");
+                if (res.data.status) {
+                    setUser(res.data.user);
+                } else {
+                    setUser(null);
+                }
+            } catch (err) {
+                console.error("Session restore failed:", err);
+                setUser(null);
+            } finally {
+                setLoading(false); // ⬅️ Set loading false after check finishes
+            }
+        };
+
+        verifyUser();
+    }, []);
 
     const handleRegister = async (name, username, password, email) => {
         try {
@@ -72,9 +93,12 @@ export const AuthProvider = ({ children }) => {
     const data = {
         user,
         setUser,
+        loading,
         handleRegister,
         handleLogin,
     };
 
     return <AuthContext.Provider value={data}>{children}</AuthContext.Provider>;
 };
+
+export default AuthProvider;
