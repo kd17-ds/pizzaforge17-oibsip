@@ -3,16 +3,23 @@ import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { BASE_URL } from "../constants/constants";
 import httpStatus from "http-status";
+import { useLoader } from "../contexts/LoadingContext";
+import { useNotification } from "../contexts/NotificationContext";
 
 export default function AddPizzasPage() {
 
+    const client = axios.create({
+        baseURL: BASE_URL,
+        withCredentials: true,
+    });
+
     const navigate = useNavigate();
-    const [message, setMessage] = useState("");
-    const [error, setError] = useState("");
+    const { showLoader, hideLoader } = useLoader();
+    const { showNotification } = useNotification();
     const [formData, setFormData] = useState({
         name: "",
         description: "",
-        category: "",
+        category: "Veg",
         image_url: "",
         availability: true,
         prices: {
@@ -49,16 +56,19 @@ export default function AddPizzasPage() {
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            const res = await axios.post(`${BASE_URL}/pizzas/addpizza`, formData);
+            showLoader();
+            const res = await client.post("/pizzas/addpizza", formData);
             if (res.status === httpStatus.CREATED) {
-                setMessage("Pizza added successfully");
+                showNotification("Pizza added successfully!", "success");
                 navigate("/admin/home")
             } else {
-                setError("Failed to add pizza");
+                showNotification("Failed to add pizza. Try again.", "error");
             }
 
         } catch (err) {
-            setError(err.message);
+            showNotification(err.response?.data?.message || "Something went wrong.", "error");
+        } finally {
+            hideLoader();
         }
     }
 
@@ -67,8 +77,7 @@ export default function AddPizzasPage() {
             <div className="w-full max-w-xl bg-white rounded-xl shadow-md p-6">
                 <h2 className="text-2xl font-bold text-center mb-6 text-sec">Add New Pizza</h2>
 
-                {message && <p className="text-green-600 text-sm mb-2">{message}</p>}
-                {error && <p className="text-red-600 text-sm mb-2">{error}</p>}
+
 
                 <form onSubmit={handleSubmit} className="space-y-4">
                     <input

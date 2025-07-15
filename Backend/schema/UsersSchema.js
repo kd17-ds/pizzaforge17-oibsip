@@ -1,5 +1,5 @@
 const { Schema } = require("mongoose");
-const bcrypt = require("bcrypt"); // Bcrypt is used to hash passwords securely
+const bcrypt = require("bcrypt");
 
 const UsersSchema = new Schema({
   email: {
@@ -29,10 +29,8 @@ const UsersSchema = new Schema({
   },
 });
 
-// Mongoose Middleware - runs **before saving** a user to the database
 UsersSchema.pre("save", async function () {
-  // Bcrypt hashes the password with a salt of 12 rounds
-  this.password = await bcrypt.hash(this.password, 12); // `this` refers to the user document about to be saved
+  this.password = await bcrypt.hash(this.password, 12);
 });
 
 module.exports = { UsersSchema };

@@ -74,6 +74,7 @@ module.exports.Login = async (req, res, next) => {
       success: true,
       user: {
         id: user._id,
+        verified: user.verified,
         username: user.username,
         email: user.email,
         isAdmin: user.isAdmin,

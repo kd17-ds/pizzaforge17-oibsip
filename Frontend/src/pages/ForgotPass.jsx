@@ -2,43 +2,46 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { BASE_URL } from "../constants/constants";
+import { useLoader } from "../contexts/LoadingContext";
+import { useNotification } from '../contexts/NotificationContext'
 
 export default function ForgotPass() {
     const [password, setPassword] = useState("");
     const [confirmPassword, setConfirmPassword] = useState("");
-    const [message, setMessage] = useState("");
-    const [error, setError] = useState("");
+    const { showNotification } = useNotification();
     const navigate = useNavigate();
+    const { showLoader, hideLoader } = useLoader();
 
     const handleSubmit = async () => {
         const token = new URLSearchParams(window.location.search).get("token");
 
         if (!token) {
-            setError("Invalid or missing token.");
+            showNotification("Invalid or missing token.", "error"); setError("Invalid or missing token.");
             return;
         }
 
         if (!password || !confirmPassword) {
-            setError("Please fill in both fields.");
+            showNotification("Please fill in both fields.", "error");
             return;
         }
 
         if (password !== confirmPassword) {
-            setError("Passwords do not match.");
+            showNotification("Password doesn't match.", "error");
             return;
         }
 
         try {
+            showLoader();
             const res = await axios.post(`${BASE_URL}/resetpass?token=${token}`, {
                 password,
             });
 
-            setMessage(res.data.message || "Password reset successfully");
-            setError("");
+            showNotification(res.data.message || "Password reset successfully", "success");
             navigate("/login");
         } catch (err) {
-            setError("Reset failed. Try again.");
-            setMessage("");
+            showNotification("Reset failed. Try again.", "error");
+        } finally {
+            hideLoader();
         }
     };
 
@@ -65,9 +68,6 @@ export default function ForgotPass() {
                         onChange={(e) => setConfirmPassword(e.target.value)}
                         className="w-full border border-gray-300 rounded px-3 py-2"
                     />
-
-                    {error && <p className="text-red-600 text-sm">{error}</p>}
-                    {message && <p className="text-green-600 text-sm">{message}</p>}
 
                     <button
                         onClick={handleSubmit}

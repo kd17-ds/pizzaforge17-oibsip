@@ -30,7 +30,7 @@ const AuthProvider = ({ children }) => {
                 console.error("Session restore failed:", err);
                 setUser(null);
             } finally {
-                setLoading(false); // ⬅️ Set loading false after check finishes
+                setLoading(false);
             }
         };
 

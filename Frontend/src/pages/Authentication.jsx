@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from "react";
 import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 import { useNavigate, useLocation } from "react-router-dom";
-import { Snackbar } from "@mui/material";
+import { useNotification } from '../contexts/NotificationContext'
 import { useAuth } from "../hooks/useAuth";
+import { useLoader } from "../contexts/LoadingContext";
 import { BASE_URL } from "../constants/constants";
 import axios from 'axios';
 
@@ -10,15 +11,14 @@ export default function Authentication({ formType }) {
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
     const [name, setName] = useState("");
-    const [error, setError] = useState("");
-    const [message, setMessage] = useState("");
     const [formState, setFormState] = useState(formType === "signup" ? 1 : 0);
-    const [open, setOpen] = useState(false);
     const [email, setEmail] = useState("");
 
     const navigate = useNavigate();
     const location = useLocation();
     const { handleRegister, handleLogin } = useAuth();
+    const { showNotification } = useNotification();
+    const { showLoader, hideLoader } = useLoader();
 
     useEffect(() => {
         if (location.pathname === "/signup") setFormState(1);
@@ -32,49 +32,53 @@ export default function Authentication({ formType }) {
 
     const passChange = async () => {
         if (!email) {
-            setError("Please enter your email to reset password.");
+            showNotification("Please enter your email to reset password.", "error");
             return;
         }
         try {
+            showLoader();
             const res = await axios.post(`${BASE_URL}/forgotpass`, { email });
-            setMessage(res.data.message || "Reset link sent to your email");
-            setOpen(true);
-            setError("");
+            showNotification(res.data.message || "Reset link sent to your email", "success");
         } catch (err) {
-            setError(err.message || "Something went wrong.");
+            showNotification(err.message || "Something went wrong.", "error");
+        } finally {
+            hideLoader();
         }
     }
 
     const handleAuth = async () => {
         try {
+            showLoader();
             if (formState === 0) {
                 const result = await handleLogin(email, password);
                 console.log("Login result:", result);
                 if (!result) {
-                    setError("Login failed. Please try again.");
+                    showNotification("Login failed. Please try again.", "error");
+                    hideLoader();
                     return;
                 }
                 const { message: msg, user: loggedInUser } = result;
-                if (loggedInUser?.isAdmin) {
-                    navigate('/admin/home');
-                } else {
-                    navigate('/');
+
+                if (!loggedInUser?.verified) {
+                    showNotification("Please verify your email before logging in.", "warning");
+                    hideLoader();
+                    return;
                 }
-                setMessage(msg || "Login successful!");
-                setError("");
-                setOpen(true);
+
+                showNotification(msg || "Login successful!", "success");
+                navigate(loggedInUser?.isAdmin ? '/admin/home' : '/');
             }
 
             if (formState === 1) {
-                const msg = await handleRegister(name, username, password, email); // ✅ get returned message
-                setMessage(msg || "A verification link has been sent to your email.");
-                setError("");
-                setOpen(true);
+                const msg = await handleRegister(name, username, password, email);
+                showNotification(msg || "A verification link has been sent to your email.", "success");
                 setFormState(0);
                 navigate("/login");
             }
         } catch (err) {
-            setError(err.message || "An error occurred");
+            showNotification(err.message || "An error occurred", "error");
+        } finally {
+            hideLoader();
         }
     };
 
@@ -145,7 +149,7 @@ export default function Authentication({ formType }) {
                             <div className="w-full text-left">
                                 <button
                                     type="button"
-                                    className="text-blue-600 text-sm hover:underline"
+                                    className="text-blue-600 text-sm hover:underline hover:cursor-pointer"
                                     onClick={passChange}
                                 >
                                     Forgot Password?
@@ -153,7 +157,6 @@ export default function Authentication({ formType }) {
                             </div>
                         )}
 
-                        {error && <p className="text-red-600 text-sm">{error}</p>}
 
                         <button
                             type="button"
@@ -165,15 +168,6 @@ export default function Authentication({ formType }) {
                     </form>
                 </div>
             </div>
-
-            {/* Snackbar */}
-            <Snackbar
-                open={open}
-                autoHideDuration={4000}
-                onClose={() => setOpen(false)}
-                message={message}
-                anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
-            />
         </div>
     );
 }

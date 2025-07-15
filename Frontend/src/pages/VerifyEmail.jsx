@@ -2,37 +2,45 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import { BASE_URL } from "../constants/constants";
 import { Link } from "react-router-dom";
+import { useLoader } from "../contexts/LoadingContext";
+import { useNotification } from "../contexts/NotificationContext";
 
 export default function VerifyEmail() {
-    const [message, setMessage] = useState("Verifying...");
     const [verified, setVerified] = useState(false);
+
+    const { showLoader, hideLoader } = useLoader();
+    const { showNotification } = useNotification();
 
     useEffect(() => {
         const token = new URLSearchParams(window.location.search).get("token");
 
         if (!token) {
-            setMessage("Verification token missing.");
+            showNotification("Token missing or invalid.", "error");
             return;
         }
 
-        axios
-            .get(`${BASE_URL}/verifyemail?token=${token}`)
-            .then((res) => {
+        const verify = async () => {
+            try {
+                showLoader();
+                const res = await axios.get(`${BASE_URL}/verifyemail?token=${token}`);
                 if (res.data.status) {
-                    setMessage("Email verified successfully. You can now login.");
                     setVerified(true);
+                    showNotification("Your email has been verified!", "success");
                 } else {
-                    setMessage("Verification failed or token expired.");
+                    showNotification("Verification failed or token expired.", "error");
                 }
-            })
-            .catch(() => {
-                setMessage("Something went wrong. Please try again later.");
-            });
+            } catch (err) {
+                showNotification("Server error. Please try again later.", "error");
+            } finally {
+                hideLoader();
+            }
+        };
+
+        verify();
     }, []);
 
     return (
         <div className="flex flex-col items-center justify-center min-h-screen text-xl font-medium text-amber-500">
-            <p className="mb-4">{message}</p>
             {verified && (
                 <Link to="/login">
                     <button className="bg-amber-500 hover:bg-amber-600 text-white font-semibold py-2 px-4 rounded transition">
