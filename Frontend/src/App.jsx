@@ -1,12 +1,12 @@
 import { Routes, Route } from 'react-router-dom';
-import Authentication from './pages/Authentication';
+import Authentication from './pages/commonPages/Authentication';
 import MainLayout from './layout/MainLayout'
-import HomePage from './pages/HomePage';
-import VerifyEmail from './pages/VerifyEmail';
-import ForgotPass from './pages/ForgotPass';
-import AdminHomePage from './pages/AdminHomePage';
-import AddPizzasPage from './pages/AddPizzasPage';
-import AdminProtectedRoute from './pages/AdminProtectedRoutes';
+import HomePage from './pages/userPages/HomePage';
+import VerifyEmail from './pages/commonPages/VerifyEmail';
+import ForgotPass from './pages/commonPages/ForgotPass';
+import AdminHomePage from './pages/adminPages/AdminHomePage';
+import AddPizzasPage from './pages/adminPages/AddPizzasPage';
+import AdminProtectedRoute from './routes/AdminProtectedRoutes';
 
 function App() {
     return (

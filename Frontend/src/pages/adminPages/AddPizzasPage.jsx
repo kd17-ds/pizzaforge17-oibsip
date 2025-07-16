@@ -1,10 +1,10 @@
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
-import { BASE_URL } from "../constants/constants";
+import { BASE_URL } from "../../constants/constants";
 import httpStatus from "http-status";
-import { useLoader } from "../contexts/LoadingContext";
-import { useNotification } from "../contexts/NotificationContext";
+import { useLoader } from "../../contexts/LoadingContext";
+import { useNotification } from "../../contexts/NotificationContext";
 
 export default function AddPizzasPage() {
 
@@ -108,7 +108,7 @@ export default function AddPizzasPage() {
                         required
                     >
                         <option value="Veg">Veg</option>
-                        <option value="Non-veg">Non-Veg</option>
+                        <option value="Non-Veg">Non-Veg</option>
                     </select>
 
                     <input

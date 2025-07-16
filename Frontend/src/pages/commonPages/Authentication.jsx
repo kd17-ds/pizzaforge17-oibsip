@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from "react";
 import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 import { useNavigate, useLocation } from "react-router-dom";
-import { useNotification } from '../contexts/NotificationContext'
-import { useAuth } from "../hooks/useAuth";
-import { useLoader } from "../contexts/LoadingContext";
-import { BASE_URL } from "../constants/constants";
+import { useNotification } from '../../contexts/NotificationContext'
+import { useAuth } from "../../hooks/useAuth";
+import { useLoader } from "../../contexts/LoadingContext";
+import { BASE_URL } from "../../constants/constants";
 import axios from 'axios';
 
 export default function Authentication({ formType }) {
@@ -29,22 +29,6 @@ export default function Authentication({ formType }) {
         setFormState(state);
         navigate(state === 0 ? "/login" : "/signup");
     };
-
-    const passChange = async () => {
-        if (!email) {
-            showNotification("Please enter your email to reset password.", "error");
-            return;
-        }
-        try {
-            showLoader();
-            const res = await axios.post(`${BASE_URL}/forgotpass`, { email });
-            showNotification(res.data.message || "Reset link sent to your email", "success");
-        } catch (err) {
-            showNotification(err.message || "Something went wrong.", "error");
-        } finally {
-            hideLoader();
-        }
-    }
 
     const handleAuth = async () => {
         try {
@@ -81,6 +65,24 @@ export default function Authentication({ formType }) {
             hideLoader();
         }
     };
+
+    const passChange = async () => {
+        if (!email) {
+            showNotification("Please enter your email to reset password.", "error");
+            return;
+        }
+        try {
+            showLoader();
+            const res = await axios.post(`${BASE_URL}/forgotpass`, { email });
+            showNotification(res.data.message || "Reset link sent to your email", "success");
+        } catch (err) {
+            showNotification(err.message || "Something went wrong.", "error");
+        } finally {
+            hideLoader();
+        }
+    }
+
+
 
     return (
         <div className="min-h-screen flex items-center justify-center bg-gray-100 px-4 lg:pb-0 pb-10">

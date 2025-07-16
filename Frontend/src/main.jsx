@@ -9,11 +9,11 @@ import { NotificationProvider } from "./contexts/NotificationContext";
 createRoot(document.getElementById('root')).render(
   <BrowserRouter>
     <LoadingProvider>
-      <AuthProvider>
-        <NotificationProvider>
+      <NotificationProvider>
+        <AuthProvider>
           <App />
-        </NotificationProvider>
-      </AuthProvider>
+        </AuthProvider>
+      </NotificationProvider>
     </LoadingProvider>
   </BrowserRouter>,
 );

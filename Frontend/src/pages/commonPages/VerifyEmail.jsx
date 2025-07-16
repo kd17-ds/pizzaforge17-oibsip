@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
-import { BASE_URL } from "../constants/constants";
+import { BASE_URL } from "../../constants/constants";
 import { Link } from "react-router-dom";
-import { useLoader } from "../contexts/LoadingContext";
-import { useNotification } from "../contexts/NotificationContext";
+import { useLoader } from "../../contexts/LoadingContext";
+import { useNotification } from "../../contexts/NotificationContext";
 
 export default function VerifyEmail() {
     const [verified, setVerified] = useState(false);

@@ -1,5 +1,5 @@
-// components/Notification.jsx
 export default function Notification({ message, type, onClose }) {
+
     const bg = {
         success: "bg-green-500",
         error: "bg-red-500",

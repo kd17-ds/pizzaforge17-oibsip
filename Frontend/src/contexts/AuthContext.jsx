@@ -2,8 +2,7 @@ import { createContext, useState, useEffect } from "react";
 import axios from "axios";
 import httpStatus from "http-status";
 import { BASE_URL } from "../constants/constants";
-import { useNavigate } from "react-router-dom";
-import { jwtDecode } from "jwt-decode"
+import { jwtDecode } from "jwt-decode";
 
 export const AuthContext = createContext({});
 
@@ -14,7 +13,6 @@ const client = axios.create({
 
 const AuthProvider = ({ children }) => {
     const [user, setUser] = useState(null);
-    const navigate = useNavigate();
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {

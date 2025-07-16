@@ -1,32 +1,39 @@
-import { createContext, useContext, useState } from "react";
-import Notification from "../components/Notification"; // your custom banner
+import { createContext, useContext, useRef, useState } from "react";
+import Notification from "../components/Notification";
 
 const NotificationContext = createContext();
 
 export const NotificationProvider = ({ children }) => {
-    const [notification, setNotification] = useState({ open: false, message: "", type: "success" });
+    const [notification, setNotification] = useState({
+        open: false,
+        message: "",
+        type: "success"
+    });
 
-    let timeoutId;
+    const timeoutRef = useRef(null);
 
     const showNotification = (message, type = "success") => {
         setNotification({ open: true, message, type });
 
-        // Clear any existing timeout
-        if (timeoutId) clearTimeout(timeoutId);
 
-        // Set new timeout
-        timeoutId = setTimeout(() => {
+        if (timeoutRef.current) {
+            clearTimeout(timeoutRef.current);
+        }
+
+
+        timeoutRef.current = setTimeout(() => {
             setNotification({ open: false, message: "", type });
-            timeoutId = null;
+            timeoutRef.current = null;
         }, 4000);
     };
 
     const hideNotification = () => {
-        if (timeoutId) clearTimeout(timeoutId);
+        if (timeoutRef.current) {
+            clearTimeout(timeoutRef.current);
+        }
         setNotification({ open: false, message: "", type: "success" });
-        timeoutId = null;
+        timeoutRef.current = null;
     };
-
 
     return (
         <NotificationContext.Provider value={{ showNotification }}>

@@ -12,9 +12,11 @@ module.exports.Signup = async (req, res, next) => {
   try {
     const { email, password, username, createdAt } = req.body;
     const existingUser = await UsersModel.findOne({ email });
+
     if (existingUser) {
-      return res.json({ message: "User already exists" });
+      return res.json({ message: "User with this email already exists" });
     }
+
     const user = await UsersModel.create({
       email,
       password,
@@ -24,6 +26,7 @@ module.exports.Signup = async (req, res, next) => {
 
     const verificationToken = emailVerificationToken(user._id);
     const verificationUrl = `http://localhost:5173/verifyemail?token=${verificationToken}`;
+
     await sendEmail(
       user.email,
       "Verify your PizzaForge account",
@@ -43,10 +46,13 @@ module.exports.Signup = async (req, res, next) => {
 module.exports.Login = async (req, res, next) => {
   try {
     const { email, password } = req.body;
+
     if (!email || !password) {
       return res.json({ message: "All fields are required" });
     }
+
     const user = await UsersModel.findOne({ email });
+
     if (!user) {
       return res.json({ message: "Incorrect password or email" });
     }
@@ -56,14 +62,14 @@ module.exports.Login = async (req, res, next) => {
       });
     }
 
-    // Compare entered password with hashed password in DB
     const auth = await bcrypt.compare(password, user.password);
+
     if (!auth) {
       return res.json({ message: "Incorrect password or email" });
     }
-    // If password is correct, create a token
+
     const token = createSecretToken(user._id, user.isAdmin);
-    // Set the token in cookie
+
     res.cookie("token", token, {
       withCredentials: true,
       httpOnly: true,
@@ -88,9 +94,11 @@ module.exports.Login = async (req, res, next) => {
 
 module.exports.VerifyEmail = async (req, res) => {
   const token = req.query.token;
+
   if (!token) {
     return res.json({ status: false });
   }
+
   try {
     const decoded = jwt.verify(token, process.env.EMAIL_SECRET);
 
@@ -108,12 +116,14 @@ module.exports.ForgotPass = async (req, res) => {
   const { email } = req.body;
   try {
     const user = await UsersModel.findOne({ email });
+
     if (!user) {
       return res.json({ message: "No User exists with the email" });
     }
 
     const token = createResetToken(user._id);
     const resetPassUrl = `http://localhost:5173/forgotpass?token=${token}`;
+
     await sendEmail(
       user.email,
       "Reset Your Password - PizzaForge",
@@ -129,9 +139,11 @@ module.exports.ForgotPass = async (req, res) => {
 
 module.exports.ResetPass = async (req, res) => {
   const token = req.query.token;
+
   if (!token) {
     return res.json({ status: false });
   }
+
   try {
     const allowReset = jwt.verify(token, process.env.RESET_SECRET);
     const { password } = req.body;
@@ -153,6 +165,7 @@ module.exports.ResetPass = async (req, res) => {
 
 module.exports.VerifyUserFromCookie = async (req, res) => {
   const token = req.cookies.token;
+
   if (!token) {
     return res.json({ status: false });
   }

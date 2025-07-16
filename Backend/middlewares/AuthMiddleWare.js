@@ -2,19 +2,19 @@ const User = require("../models/UsersModel");
 require("dotenv").config();
 const jwt = require("jsonwebtoken");
 
-// This function checks whether the user is logged in or not
 module.exports.userVerification = (req, res) => {
-  const token = req.cookies.token; // Get the token from browser cookies
+  const token = req.cookies.token;
+
   if (!token) {
-    return res.json({ status: false }); // If there is no token, user is not logged in
+    return res.json({ status: false });
   }
-  // Verify the token using the secret key
+
   jwt.verify(token, process.env.TOKEN_KEY, async (err, data) => {
     if (err) {
-      return res.json({ status: false }); // If token is invalid or expired
+      return res.json({ status: false });
     } else {
-      const user = await User.findById(data.id); // If token is valid, find the user in the database using ID from token
-      // If user exists, send success and username
+      const user = await User.findById(data.id);
+
       if (user) return res.json({ status: true, user: user.username });
       else return res.json({ status: false });
     }
@@ -24,6 +24,7 @@ module.exports.userVerification = (req, res) => {
 module.exports.isAdmin = async (req, res, next) => {
   try {
     const token = req.cookies.token;
+
     if (!token) {
       return res
         .status(401)
