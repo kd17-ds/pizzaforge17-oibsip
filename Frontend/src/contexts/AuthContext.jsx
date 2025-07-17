@@ -45,10 +45,16 @@ const AuthProvider = ({ children }) => {
             });
 
             if (res.status === httpStatus.CREATED) {
-                return res.data.message;
+                return res.data;
+            } else {
+                return { success: false, message: res.data?.message || "Signup failed" };
             }
         } catch (err) {
-            throw err;
+            return {
+                success: false,
+                message:
+                    err?.response?.data?.message || "Something went wrong during signup",
+            };
         }
     };
 
@@ -56,10 +62,7 @@ const AuthProvider = ({ children }) => {
     const handleLogin = async (email, password) => {
         try {
             const res = await client.post("/login", { email, password });
-            console.log("Login response:", res);
-
-            if (res.status === httpStatus.OK) {
-                // Extract token from cookie
+            if (res.status === httpStatus.OK && res.data.user) {
                 const token = document.cookie
                     .split("; ")
                     .find((row) => row.startsWith("token="))
@@ -77,16 +80,14 @@ const AuthProvider = ({ children }) => {
                     ...tokenData,
                 };
 
-                setUser(fullUser);
-                return { message: res.data.message, user: fullUser };
+                return { success: true, message: res.data.message, user: fullUser };
             }
-
-            return null;
+            return { success: false, message: res.data.message || "Invalid credentials." };
         } catch (err) {
             console.error("Login error:", err);
-            return null;
+            return { success: false, message: err.response?.data?.message || "Login failed." };
         }
-    };
+    }
 
     const data = {
         user,

@@ -14,7 +14,10 @@ module.exports.Signup = async (req, res, next) => {
     const existingUser = await UsersModel.findOne({ email });
 
     if (existingUser) {
-      return res.json({ message: "User with this email already exists" });
+      return res.json({
+        success: false,
+        message: "User with this email already exists",
+      });
     }
 
     const user = await UsersModel.create({
@@ -39,7 +42,11 @@ module.exports.Signup = async (req, res, next) => {
     });
     next();
   } catch (error) {
-    console.error(error);
+    if (error.code === 11000 && error.keyPattern.email) {
+      return res.status(409).json({ message: "Email already exists" });
+    }
+    console.error("Signup error:", error);
+    return res.status(500).json({ message: "Signup failed", error });
   }
 };
 

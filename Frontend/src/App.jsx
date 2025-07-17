@@ -7,6 +7,7 @@ import ForgotPass from './pages/commonPages/ForgotPass';
 import AdminHomePage from './pages/adminPages/AdminHomePage';
 import AddPizzasPage from './pages/adminPages/AddPizzasPage';
 import AdminProtectedRoute from './routes/AdminProtectedRoutes';
+import ShowPizzasPage from './pages/userPages/ShowPizzasPage';
 
 function App() {
     return (
@@ -17,6 +18,7 @@ function App() {
                 <Route path='/signup' element={<Authentication formType='signup' />} />
                 <Route path='/verifyemail' element={<VerifyEmail />} />
                 <Route path='/forgotpass' element={<ForgotPass />} />
+                <Route path='/showallpizzas' element={<ShowPizzasPage />} />
                 <Route
                     path="/admin/home"
                     element={

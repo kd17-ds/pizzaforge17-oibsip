@@ -36,6 +36,15 @@ module.exports.AddPizza = async (req, res) => {
   }
 };
 
+module.exports.ShowAllPizzas = async (req, res) => {
+  try {
+    const pizzas = await PizzasModel.find({});
+    res.status(200).json(pizzas);
+  } catch (err) {
+    console.error("Error fetching pizzas:", err);
+  }
+};
+
 module.exports.GetPizzaDetails = async (req, res) => {
   try {
     const id = req.params.id;

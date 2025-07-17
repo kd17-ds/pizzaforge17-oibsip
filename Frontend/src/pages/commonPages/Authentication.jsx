@@ -33,14 +33,17 @@ export default function Authentication({ formType }) {
     const handleAuth = async () => {
         try {
             showLoader();
+
             if (formState === 0) {
                 const result = await handleLogin(email, password);
                 console.log("Login result:", result);
-                if (!result) {
-                    showNotification("Login failed. Please try again.", "error");
+
+                if (!result.success) {
+                    showNotification(result.message || "Login failed. Please try again.", "error");
                     hideLoader();
                     return;
                 }
+
                 const { message: msg, user: loggedInUser } = result;
 
                 if (!loggedInUser?.verified) {
@@ -54,10 +57,14 @@ export default function Authentication({ formType }) {
             }
 
             if (formState === 1) {
-                const msg = await handleRegister(name, username, password, email);
-                showNotification(msg || "A verification link has been sent to your email.", "success");
-                setFormState(0);
-                navigate("/login");
+                const res = await handleRegister(name, username, password, email);
+                if (res.success) {
+                    showNotification(res.message || "A verification link has been sent to your email.", "success");
+                    setFormState(0);
+                    navigate("/login");
+                } else {
+                    showNotification(res.message || "Signup failed", "error");
+                }
             }
         } catch (err) {
             showNotification(err.message || "An error occurred", "error");
