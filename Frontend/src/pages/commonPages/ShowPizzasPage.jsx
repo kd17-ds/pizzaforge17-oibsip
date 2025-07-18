@@ -20,12 +20,21 @@ export default function ShowPizzasPage() {
     const [showUpdate, setShowUpdate] = useState(false);
     const [showDelete, setShowDelete] = useState(false);
     const { user } = useAuth();
+    const [filter, setFilter] = useState(``);
 
     const fetchData = async () => {
         try {
             showLoader();
             const pizzaData = await client.get(`/pizzas/showallpizzas`);
-            setPizzas(pizzaData.data);
+            if (filter === `Veg`) {
+                const filteredPizzas = pizzaData.data.filter(pizza => pizza.category === "Veg");
+                setPizzas(filteredPizzas);
+            } else if (filter === 'Non-Veg') {
+                const filteredPizzas = pizzaData.data.filter(pizza => pizza.category === "Non-Veg");
+                setPizzas(filteredPizzas);
+            } else {
+                setPizzas(pizzaData.data);
+            }
             if (user.isAdmin) {
                 setShowUpdate(true);
                 setShowDelete(true);
@@ -38,8 +47,14 @@ export default function ShowPizzasPage() {
     }
 
     useEffect(() => {
-        if (user) fetchData();
-    }, [user]);
+        if (user) {
+            fetchData();
+        }
+    }, [user, filter]);
+
+    const filterPizzas = (e) => {
+        setFilter(e.target.value);
+    };
 
     const handleDelete = async (id) => {
         const confirm = window.confirm("Are you sure you want to delete this transaction?");
@@ -60,6 +75,33 @@ export default function ShowPizzasPage() {
 
     return (
         <>
+            <form className="flex flex-col sm:flex-row items-center gap-4 bg-white p-4 rounded-lg shadow-md">
+                <p className="text-lg font-medium text-gray-700">Filter:</p>
+
+                <div className="flex items-center gap-2">
+                    <input
+                        type="radio"
+                        id="Veg"
+                        name="category"
+                        value="Veg"
+                        className="accent-green-600"
+                        onChange={filterPizzas}
+                    />
+                    <label htmlFor="Veg" className="text-gray-600">Veg</label>
+                </div>
+
+                <div className="flex items-center gap-2">
+                    <input
+                        type="radio"
+                        id="Non-Veg"
+                        name="category"
+                        value="Non-Veg"
+                        className="accent-red-600"
+                        onChange={filterPizzas}
+                    />
+                    <label htmlFor="Non-Veg" className="text-gray-600">Non-Veg</label>
+                </div>
+            </form>
             <div className="p-6 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
                 {pizzas.map((pizza) => (
                     <div
@@ -82,7 +124,7 @@ export default function ShowPizzasPage() {
                         <div className="flex justify-between mt-4">
                             {showUpdate && (
                                 <Link
-                                    to={`pizzas/updatepizza/${pizza._id}`}
+                                    to={`/pizzas/updatepizza/${pizza._id}`}
                                     className="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded-md text-sm"
                                 >
                                     Update

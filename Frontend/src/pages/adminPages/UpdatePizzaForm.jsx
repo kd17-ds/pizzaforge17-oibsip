@@ -1,18 +1,18 @@
 import axios from "axios";
-import { useNavigate } from "react-router-dom";
-import { useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
+import { useEffect, useState } from "react";
 import { BASE_URL } from "../../constants/constants";
-import httpStatus from "http-status";
 import { useLoader } from "../../contexts/LoadingContext";
 import { useNotification } from "../../contexts/NotificationContext";
 
-export default function AddPizzasPage() {
+export default function UpdatePizzaForm() {
 
     const client = axios.create({
         baseURL: BASE_URL,
         withCredentials: true,
     });
 
+    const { id } = useParams();
     const navigate = useNavigate();
     const { showLoader, hideLoader } = useLoader();
     const { showNotification } = useNotification();
@@ -27,7 +27,33 @@ export default function AddPizzasPage() {
             medium: "",
             large: ""
         }
-    })
+    });
+
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                showLoader();
+                const res = await client.get(`/pizzas/updatepizza/${id}`);
+                setFormData({
+                    name: res.data.name,
+                    description: res.data.description,
+                    category: res.data.category,
+                    image_url: res.data.image_url,
+                    availability: res.data.availability,
+                    prices: {
+                        small: res.data.prices.small,
+                        medium: res.data.prices.medium,
+                        large: res.data.prices.large
+                    }
+                });
+            } catch (err) {
+                showNotification(err.response?.data?.message || "Something went wrong.", "error");
+            } finally {
+                hideLoader();
+            }
+        }
+        fetchData();
+    }, [])
 
     const handleChange = (e) => {
         const { name, value, checked } = e.target;
@@ -57,14 +83,9 @@ export default function AddPizzasPage() {
         e.preventDefault();
         try {
             showLoader();
-            const res = await client.post("/pizzas/addpizza", formData);
-            if (res.status === httpStatus.CREATED) {
-                showNotification("Pizza added successfully!", "success");
-                navigate("/showallpizzas")
-            } else {
-                showNotification("Failed to add pizza. Try again.", "error");
-            }
-
+            const res = await client.put(`/pizzas/updatepizza/${id}`, formData);
+            showNotification("Pizza Updated Successfully", "success");
+            navigate("/showallpizzas");
         } catch (err) {
             showNotification(err.response?.data?.message || "Something went wrong.", "error");
         } finally {
@@ -75,10 +96,7 @@ export default function AddPizzasPage() {
     return (
         <div className="min-h-screen bg-gray-100 flex items-center justify-center px-4 py-10">
             <div className="w-full max-w-xl bg-white rounded-xl shadow-md p-6">
-                <h2 className="text-2xl font-bold text-center mb-6 text-sec">Add New Pizza</h2>
-
-
-
+                <h2 className="text-2xl font-bold text-center mb-6 text-sec">Update Pizza</h2>
                 <form onSubmit={handleSubmit} className="space-y-4">
                     <input
                         type="text"
@@ -166,7 +184,14 @@ export default function AddPizzasPage() {
                         type="submit"
                         className="w-full bg-sec text-white py-2 rounded-lg hover:bg-lite transition"
                     >
-                        Add Pizza
+                        Update Pizza
+                    </button>
+                    <button
+                        type="button"
+                        onClick={() => navigate('/showallpizzas')}
+                        className="w-full mt-2 border border-sec text-sec py-2 rounded-lg hover:bg-gray-100 transition"
+                    >
+                        Cancel
                     </button>
                 </form>
             </div>
