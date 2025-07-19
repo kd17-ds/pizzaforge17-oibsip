@@ -154,3 +154,47 @@ const pizzaData = [
 ];
 
 module.exports = { pizzaData };
+
+const bases = [
+  { name: "Thin Crust", price: 100, availableQty: 20 },
+  { name: "Hand Tossed", price: 120, availableQty: 20 },
+  { name: "Cheese Burst", price: 150, availableQty: 20 },
+  { name: "Whole Wheat", price: 130, availableQty: 20 },
+  { name: "Gluten-Free", price: 140, availableQty: 20 },
+];
+
+const sauces = [
+  { name: "Classic Tomato", price: 20, availableQty: 50 },
+  { name: "Spicy Peri Peri", price: 25, availableQty: 50 },
+  { name: "Pesto Basil", price: 30, availableQty: 50 },
+  { name: "Garlic Alfredo", price: 35, availableQty: 50 },
+  { name: "Barbecue", price: 25, availableQty: 50 },
+];
+
+const cheeses = [
+  { name: "Mozzarella", price: 40, availableQty: 40 },
+  { name: "Cheddar", price: 50, availableQty: 40 },
+  { name: "Parmesan", price: 60, availableQty: 40 },
+  { name: "Vegan Cheese", price: 55, availableQty: 40 },
+  { name: "Double Cheese Mix", price: 65, availableQty: 40 },
+];
+
+const veggies = [
+  { name: "Onion", price: 10, availableQty: 100 },
+  { name: "Tomato", price: 10, availableQty: 100 },
+  { name: "Capsicum", price: 15, availableQty: 100 },
+  { name: "Corn", price: 15, availableQty: 100 },
+  { name: "Jalapeños", price: 20, availableQty: 100 },
+  { name: "Olives", price: 20, availableQty: 100 },
+  { name: "Mushrooms", price: 25, availableQty: 100 },
+  { name: "Paneer", price: 30, availableQty: 100 },
+  { name: "Spinach", price: 15, availableQty: 100 },
+  { name: "Red Paprika", price: 20, availableQty: 100 },
+];
+
+module.exports = {
+  bases,
+  sauces,
+  cheeses,
+  veggies,
+};
