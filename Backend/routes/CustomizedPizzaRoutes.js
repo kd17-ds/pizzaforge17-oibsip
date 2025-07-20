@@ -1,9 +1,17 @@
 const router = require("express").Router();
 const { isAdmin } = require("../middlewares/AuthMiddleWare");
 const {
-  UpdateInventory,
+  AddIngredients,
+  ShowAllIngredients,
+  GetIngredientsDetail,
+  UpdateIngredientsDetails,
+  DeleteIngridient,
 } = require("../controllers/CustomizedPizzasController");
 
-router.post("/updateInventory", isAdmin, UpdateInventory);
+router.post("/addingridient", isAdmin, AddIngredients);
+router.get("/allingridients", isAdmin, ShowAllIngredients);
+router.get("/updateingridient/:id", isAdmin, GetIngredientsDetail);
+router.put("/updateingridient/:id", isAdmin, UpdateIngredientsDetails);
+router.delete("/deleteingridient/:id", isAdmin, DeleteIngridient);
 
 module.exports = router;
