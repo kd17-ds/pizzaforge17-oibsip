@@ -9,6 +9,9 @@ import AddPizzasPage from './pages/adminPages/AddPizzasPage';
 import AdminProtectedRoute from './routes/AdminProtectedRoutes';
 import ShowPizzasPage from './pages/commonPages/ShowPizzasPage';
 import UpdatePizzaForm from './pages/adminPages/UpdatePizzaForm';
+import InventoryManagementPage from './pages/adminPages/InventoryManagementPage';
+import AddIngridientPage from './pages/adminPages/AddIngridientPage';
+import UpdateIngredientForm from './pages/adminPages/UpdateIngredientForm';
 
 function App() {
     return (
@@ -34,6 +37,30 @@ function App() {
                     element={
                         <AdminProtectedRoute>
                             <AddPizzasPage />
+                        </AdminProtectedRoute>
+                    }
+                />
+                <Route
+                    path="/admin/inventory"
+                    element={
+                        <AdminProtectedRoute>
+                            <InventoryManagementPage />
+                        </AdminProtectedRoute>
+                    }
+                />
+                <Route
+                    path="/admin/inventory/addingridient"
+                    element={
+                        <AdminProtectedRoute>
+                            <AddIngridientPage />
+                        </AdminProtectedRoute>
+                    }
+                />
+                <Route
+                    path="/admin/inventory/updateingridient/:id"
+                    element={
+                        <AdminProtectedRoute>
+                            <UpdateIngredientForm />
                         </AdminProtectedRoute>
                     }
                 />

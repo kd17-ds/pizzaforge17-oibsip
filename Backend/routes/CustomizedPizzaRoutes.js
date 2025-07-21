@@ -8,7 +8,7 @@ const {
   DeleteIngridient,
 } = require("../controllers/CustomizedPizzasController");
 
-router.post("/addingridient", isAdmin, AddIngredients);
+router.post("/addingredient", isAdmin, AddIngredients);
 router.get("/allingridients", isAdmin, ShowAllIngredients);
 router.get("/updateingridient/:id", isAdmin, GetIngredientsDetail);
 router.put("/updateingridient/:id", isAdmin, UpdateIngredientsDetails);
