@@ -12,6 +12,7 @@ import UpdatePizzaForm from './pages/adminPages/UpdatePizzaForm';
 import InventoryManagementPage from './pages/adminPages/InventoryManagementPage';
 import AddIngridientPage from './pages/adminPages/AddIngridientPage';
 import UpdateIngredientForm from './pages/adminPages/UpdateIngredientForm';
+import CreatePizzaPage from './pages/userPages/CreatePizzaPage';
 
 function App() {
     return (
@@ -24,6 +25,7 @@ function App() {
                 <Route path='/forgotpass' element={<ForgotPass />} />
                 <Route path='/showallpizzas' element={<ShowPizzasPage />} />
                 <Route path='/pizzas/updatepizza/:id' element={<UpdatePizzaForm />} />
+                <Route path='/customizepizza' element={<CreatePizzaPage />} />
                 <Route
                     path="/admin/home"
                     element={

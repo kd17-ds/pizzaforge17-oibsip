@@ -2,6 +2,7 @@ const BaseModel = require("../models/BaseModel");
 const SauceModel = require("../models/SauceModel");
 const CheeseModel = require("../models/CheeseModel");
 const VeggieModel = require("../models/VeggieModel");
+const CreatedPizzaModel = require("../models/CreatedPizzasModel");
 
 const models = {
   base: BaseModel,
@@ -114,6 +115,72 @@ module.exports.DeleteIngridient = async (req, res) => {
       .status(200)
       .json({ message: `${type} deleted successfully`, data: deletedItem });
   } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
+
+module.exports.CustomizedPizza = async (req, res) => {
+  try {
+    if (!req.user) {
+      return res.status(401).json({ message: "Unauthorized user" });
+    }
+
+    const { baseType, sauce, cheese, veggies, totalPrice } = req.body;
+
+    const base = await BaseModel.findById(baseType);
+    const sauceItem = await SauceModel.findById(sauce);
+    const cheeseItem = await CheeseModel.findById(cheese);
+
+    if (!base || base.availableQty <= 0)
+      return res.status(400).json({ message: "Base not available" });
+
+    if (!sauceItem || sauceItem.availableQty <= 0)
+      return res.status(400).json({ message: "Sauce not available" });
+
+    if (!cheeseItem || cheeseItem.availableQty <= 0)
+      return res.status(400).json({ message: "Cheese not available" });
+
+    const veggieDocs = [];
+    for (const veggieId of veggies) {
+      const veg = await VeggieModel.findById(veggieId);
+      if (!veg || veg.availableQty <= 0) {
+        return res
+          .status(400)
+          .json({ message: `Veggie ${veg?.name || ""} not available` });
+      }
+      veggieDocs.push({ name: veg.name, price: veg.price });
+    }
+
+    if (!totalPrice || totalPrice <= 0) {
+      return res.status(400).json({ message: "Total price is required" });
+    }
+
+    console.log("Creating pizza for user:", req.user._id);
+    const newPizza = await CreatedPizzaModel.create({
+      user: req.user._id,
+      baseType: { name: base.name, price: base.price },
+      sauce: { name: sauceItem.name, price: sauceItem.price },
+      cheese: { name: cheeseItem.name, price: cheeseItem.price },
+      veggies: veggieDocs,
+      totalPrice,
+    });
+
+    await BaseModel.findByIdAndUpdate(baseType, { $inc: { availableQty: -1 } });
+    await SauceModel.findByIdAndUpdate(sauce, { $inc: { availableQty: -1 } });
+    await CheeseModel.findByIdAndUpdate(cheese, { $inc: { availableQty: -1 } });
+
+    for (const veggieId of veggies) {
+      await VeggieModel.findByIdAndUpdate(veggieId, {
+        $inc: { availableQty: -1 },
+      });
+    }
+
+    res.status(201).json({
+      message: "Pizza created successfully",
+      data: newPizza,
+    });
+  } catch (err) {
+    console.error("Pizza creation failed:", err);
     res.status(500).json({ message: err.message });
   }
 };

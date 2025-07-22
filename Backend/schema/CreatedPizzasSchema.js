@@ -1,6 +1,11 @@
 const { Schema } = require("mongoose");
 
 const CreatedPizzaSchema = new Schema({
+  user: {
+    type: Schema.Types.ObjectId,
+    ref: "User",
+    required: true,
+  },
   baseType: {
     name: { type: String, required: true },
   },

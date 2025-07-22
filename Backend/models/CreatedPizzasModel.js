@@ -1,7 +1,7 @@
 const { model } = require("mongoose");
 
-const { CreatedPizzasSchema } = require("../schema/CreatedPizzasSchema");
+const { CreatedPizzaSchema } = require("../schema/CreatedPizzasSchema");
 
-const CreatedPizzasModel = new model("CreatedPizza", CreatedPizzasSchema);
+const CreatedPizzasModel = new model("CreatedPizza", CreatedPizzaSchema);
 
 module.exports = CreatedPizzasModel;
