@@ -184,3 +184,16 @@ module.exports.CustomizedPizza = async (req, res) => {
     res.status(500).json({ message: err.message });
   }
 };
+
+module.exports.UserCreatedPizzas = async (req, res) => {
+  try {
+    const createdPizzas = await CreatedPizzaModel.find({ user: req.user._id })
+      .populate("baseType")
+      .populate("sauce")
+      .populate("cheese")
+      .populate("veggies");
+    res.status(200).json(createdPizzas);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};

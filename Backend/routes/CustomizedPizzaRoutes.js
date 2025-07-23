@@ -7,8 +7,10 @@ const {
   UpdateIngredientsDetails,
   DeleteIngridient,
   CustomizedPizza,
+  UserCreatedPizzas,
 } = require("../controllers/CustomizedPizzasController");
 
+router.get("/allcustomizedpizza", userVerification, UserCreatedPizzas);
 router.post("/customizepizza", userVerification, CustomizedPizza);
 router.post("/addingredient", isAdmin, AddIngredients);
 router.get("/allingridients", ShowAllIngredients);

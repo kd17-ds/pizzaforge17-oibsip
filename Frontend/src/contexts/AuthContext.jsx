@@ -80,6 +80,8 @@ const AuthProvider = ({ children }) => {
                     ...tokenData,
                 };
 
+                setUser(fullUser);
+
                 return { success: true, message: res.data.message, user: fullUser };
             }
             return { success: false, message: res.data.message || "Invalid credentials." };
