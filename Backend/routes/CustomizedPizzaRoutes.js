@@ -8,10 +8,16 @@ const {
   DeleteIngridient,
   CustomizedPizza,
   UserCreatedPizzas,
+  GetCustomizedPizzaDetail,
+  UpdateCustomizedPizza,
+  DeleteCustomizedPizza,
 } = require("../controllers/CustomizedPizzasController");
 
-router.get("/allcustomizedpizza", userVerification, UserCreatedPizzas);
 router.post("/customizepizza", userVerification, CustomizedPizza);
+router.get("/allcustomizedpizza", userVerification, UserCreatedPizzas);
+router.get("/updatedcstpizza/:id", userVerification, GetCustomizedPizzaDetail);
+router.put("/updatedcstpizza/:id", userVerification, UpdateCustomizedPizza);
+router.delete("/deletecstpizza/:id", userVerification, DeleteCustomizedPizza);
 router.post("/addingredient", isAdmin, AddIngredients);
 router.get("/allingridients", ShowAllIngredients);
 router.get("/updateingridient/:id", isAdmin, GetIngredientsDetail);

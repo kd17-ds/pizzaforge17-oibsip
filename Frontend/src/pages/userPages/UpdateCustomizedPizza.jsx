@@ -1,13 +1,14 @@
 import React, { useState, useEffect } from "react";
+import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { BASE_URL } from "../../constants/constants";
 import { useLoader } from "../../contexts/LoadingContext";
 import { useNotification } from "../../contexts/NotificationContext";
 import httpStatus from "http-status";
-import { useNavigate } from "react-router-dom";
 
-export default function CreatePizzaPage() {
+export default function UpdateCustomizedPizza() {
     const navigate = useNavigate();
+    const { id } = useParams();
     const [inventory, setInventory] = useState({});
     const { showNotification } = useNotification();
     const { showLoader, hideLoader } = useLoader();
@@ -22,22 +23,52 @@ export default function CreatePizzaPage() {
     });
 
     useEffect(() => {
-        const fetchInventory = async () => {
+        const fetchAll = async () => {
             try {
                 showLoader();
-                const res = await client.get("/customized-pizzas/allingridients");
-                if (res.status === httpStatus.OK) {
-                    setInventory(res.data);
+
+                // 1. Fetch Inventory First
+                const inventoryRes = await client.get("/customized-pizzas/allingridients");
+                if (inventoryRes.status !== httpStatus.OK) {
+                    throw new Error("Failed to fetch inventory");
                 }
+                const inventoryData = inventoryRes.data;
+                console.log(inventoryData)
+                setInventory(inventoryData);
+
+                // 2. Now fetch the Pizza (after inventory is set)
+                const pizzaRes = await client.get(`/customized-pizzas/updatedcstpizza/${id}`);
+                const pizza = pizzaRes.data;
+                console.log(pizza)
+
+                const baseObj = inventoryData.base.find(item => item.name === pizza.baseType.name);
+                const cheeseObj = inventoryData.cheese.find(item => item.name === pizza.cheese.name);
+                const sauceObj = inventoryData.sauce.find(item => item.name === pizza.sauce.name);
+                const veggieObjs = inventoryData.veggie.filter(invVeg =>
+                    pizza.veggies.some(pizzaVeg => pizzaVeg.name === invVeg.name)
+                );
+
+
+                console.log("Selected base:", baseObj);
+                console.log("Selected cheese:", cheeseObj);
+                console.log("Selected sauce:", sauceObj);
+                console.log("Selected veggies:", veggieObjs);
+
+                // 4. Set all selections
+                setSelectedBase(baseObj || null);
+                setSelectedCheese(cheeseObj || null);
+                setSelectedSauce(sauceObj || null);
+                setSelectedVeggies(veggieObjs || []);
             } catch (err) {
-                showNotification("Error Fetching", "error");
+                showNotification("Error Fetching Pizza or Ingredients", "error");
             } finally {
                 hideLoader();
             }
         };
 
-        fetchInventory();
-    }, []);
+        fetchAll();
+    }, [id]); // depends only on pizza ID
+
 
     const handleVeggieToggle = (veggie) => {
         if (selectedVeggies.find((v) => v._id === veggie._id)) {
@@ -67,7 +98,7 @@ export default function CreatePizzaPage() {
         veggie: "Veggies",
     };
 
-    const handleCreatePizza = async () => {
+    const handleUpdatePizza = async () => {
         if (!selectedBase || !selectedCheese || !selectedSauce) {
             showNotification("Please select base, cheese, and sauce", "warning");
             return;
@@ -75,7 +106,7 @@ export default function CreatePizzaPage() {
 
         try {
             showLoader();
-            const res = await client.post("/customized-pizzas/customizepizza", {
+            const res = await client.put(`/customized-pizzas/updatedcstpizza/${id}`, {
                 baseType: selectedBase._id,
                 cheese: selectedCheese._id,
                 sauce: selectedSauce._id,
@@ -84,12 +115,12 @@ export default function CreatePizzaPage() {
             });
 
             if (res.status === httpStatus.CREATED || res.status === httpStatus.OK) {
-                showNotification("Pizza created successfully!", "success");
+                showNotification("Pizza Updated successfully!", "success");
                 navigate("/allcustomizedpizza");
             }
         } catch (err) {
             console.error(err);
-            showNotification("Failed to create pizza", "error");
+            showNotification("Failed to Update pizza", "error");
         } finally {
             hideLoader();
         }
@@ -98,7 +129,7 @@ export default function CreatePizzaPage() {
     return (
         <div className="p-6 bg-gray-100 min-h-screen">
             <h1 className="text-3xl font-bold mb-6 text-center text-indigo-700">
-                🍕 Create Your Custom Pizza
+                🍕 Update Your Custom Pizza
             </h1>
 
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -229,10 +260,10 @@ export default function CreatePizzaPage() {
 
                     <button
                         className="w-full mt-6 bg-indigo-600 hover:bg-indigo-700 text-white py-2 px-4 rounded-lg transition"
-                        onClick={handleCreatePizza}
+                        onClick={handleUpdatePizza}
                         disabled={!selectedBase || !selectedCheese || !selectedSauce}
                     >
-                        🍕 Create Pizza
+                        🍕 Update Pizza
                     </button>
                 </div>
             </div>

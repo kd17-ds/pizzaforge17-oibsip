@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
+import { Link } from 'react-router-dom';
 import { BASE_URL } from "../../constants/constants";
 import { useLoader } from "../../contexts/LoadingContext";
 import { useNotification } from "../../contexts/NotificationContext";
@@ -33,6 +34,22 @@ export default function CreatePizzaPage() {
         fetchInventory();
     }, []);
 
+    const handleDelete = async (id) => {
+        try {
+            showLoader();
+            const res = await client.delete(`/customized-pizzas/deletecstpizza/${id}`);
+            if (res.status === httpStatus.OK) {
+                showNotification("Pizza Deleted", "success");
+                let filtered = inventory.filter((pizza) => pizza._id !== id);
+                setInventory(filtered);
+            }
+        } catch (err) {
+            showNotification("Error Deleting", "error");
+        } finally {
+            hideLoader();
+        }
+    }
+
     return (
         <div className="p-6 bg-gray-100 min-h-screen">
             {inventory.length > 0 ? (
@@ -45,9 +62,23 @@ export default function CreatePizzaPage() {
                             <p><strong>Cheese:</strong> {pizza.cheese.name}</p>
                             <p><strong>Veggies:</strong> {pizza.veggies.map(v => v.name).join(", ")}</p>
                             <p><strong>Total Price:</strong> ₹{pizza.totalPrice}</p>
-                            <button className="mt-3 px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700">
-                                Place Order
-                            </button>
+                            <div className="flex gap-3 mt-4">
+                                <button className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700">
+                                    Place Order
+                                </button>
+                                <Link
+                                    to={`/updatedcstpizza/${pizza._id}`}
+                                    className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+                                >
+                                    Edit
+                                </Link>
+                                <button
+                                    onClick={() => handleDelete(pizza._id)}
+                                    className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700"
+                                >
+                                    Delete
+                                </button>
+                            </div>
                         </div>
                     ))}
                 </div>

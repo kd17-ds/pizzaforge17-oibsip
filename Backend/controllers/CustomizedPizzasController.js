@@ -165,16 +165,6 @@ module.exports.CustomizedPizza = async (req, res) => {
       totalPrice,
     });
 
-    await BaseModel.findByIdAndUpdate(baseType, { $inc: { availableQty: -1 } });
-    await SauceModel.findByIdAndUpdate(sauce, { $inc: { availableQty: -1 } });
-    await CheeseModel.findByIdAndUpdate(cheese, { $inc: { availableQty: -1 } });
-
-    for (const veggieId of veggies) {
-      await VeggieModel.findByIdAndUpdate(veggieId, {
-        $inc: { availableQty: -1 },
-      });
-    }
-
     res.status(201).json({
       message: "Pizza created successfully",
       data: newPizza,
@@ -195,5 +185,91 @@ module.exports.UserCreatedPizzas = async (req, res) => {
     res.status(200).json(createdPizzas);
   } catch (err) {
     res.status(500).json({ message: err.message });
+  }
+};
+
+module.exports.GetCustomizedPizzaDetail = async (req, res) => {
+  try {
+    const id = req.params.id;
+    const sentPizza = await CreatedPizzaModel.findById(id)
+      .populate("baseType")
+      .populate("sauce")
+      .populate("cheese")
+      .populate("veggies");
+    res.status(200).json(sentPizza);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
+
+module.exports.UpdateCustomizedPizza = async (req, res) => {
+  try {
+    if (!req.user) {
+      return res.status(401).json({ message: "Unauthorized user" });
+    }
+
+    const { baseType, sauce, cheese, veggies, totalPrice } = req.body;
+
+    const base = await BaseModel.findById(baseType);
+    const sauceItem = await SauceModel.findById(sauce);
+    const cheeseItem = await CheeseModel.findById(cheese);
+
+    if (!base || base.availableQty <= 0)
+      return res.status(400).json({ message: "Base not available" });
+
+    if (!sauceItem || sauceItem.availableQty <= 0)
+      return res.status(400).json({ message: "Sauce not available" });
+
+    if (!cheeseItem || cheeseItem.availableQty <= 0)
+      return res.status(400).json({ message: "Cheese not available" });
+
+    const veggieDocs = [];
+    for (const veggieId of veggies) {
+      const veg = await VeggieModel.findById(veggieId);
+      if (!veg || veg.availableQty <= 0) {
+        return res
+          .status(400)
+          .json({ message: `Veggie ${veg?.name || ""} not available` });
+      }
+      veggieDocs.push({ name: veg.name, price: veg.price });
+    }
+
+    if (!totalPrice || totalPrice <= 0) {
+      return res.status(400).json({ message: "Total price is required" });
+    }
+
+    console.log("Updating pizza for user:", req.user._id);
+    const newPizza = await CreatedPizzaModel.findByIdAndUpdate(
+      req.params.id,
+      {
+        user: req.user._id,
+        baseType: { name: base.name, price: base.price },
+        sauce: { name: sauceItem.name, price: sauceItem.price },
+        cheese: { name: cheeseItem.name, price: cheeseItem.price },
+        veggies: veggieDocs,
+        totalPrice,
+      },
+      { new: true }
+    );
+
+    res.status(201).json({
+      message: "Pizza Updated successfully",
+      data: newPizza,
+    });
+  } catch (err) {
+    console.error("Pizza Updation failed:", err);
+    res.status(500).json({ message: err.message });
+  }
+};
+
+module.exports.DeleteCustomizedPizza = async (req, res) => {
+  try {
+    const pizza = await CreatedPizzaModel.findByIdAndDelete(req.params.id);
+    if (!pizza) {
+      return res.status(404).json({ message: "Pizza not found" });
+    }
+    res.status(200).json({ message: "Pizza deleted successfully" });
+  } catch (err) {
+    console.error("Error deleting pizza:", err);
   }
 };
