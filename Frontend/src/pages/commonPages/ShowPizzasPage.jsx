@@ -6,6 +6,7 @@ import { useLoader } from "../../contexts/LoadingContext";
 import { useNotification } from "../../contexts/NotificationContext";
 import { useAuth } from "../../hooks/useAuth";
 import { Link } from "react-router-dom";
+import { useCart } from "../../contexts/CartContext";
 
 export default function ShowPizzasPage() {
 
@@ -21,6 +22,7 @@ export default function ShowPizzasPage() {
     const [showDelete, setShowDelete] = useState(false);
     const { user } = useAuth();
     const [filter, setFilter] = useState(``);
+    const { addToCart } = useCart();
 
     const fetchData = async () => {
         try {
@@ -79,40 +81,20 @@ export default function ShowPizzasPage() {
                 <p className="text-lg font-medium text-gray-700">Filter:</p>
 
                 <div className="flex items-center gap-2">
-                    <input
-                        type="radio"
-                        id="Veg"
-                        name="category"
-                        value="Veg"
-                        className="accent-green-600"
-                        onChange={filterPizzas}
-                    />
+                    <input type="radio" id="Veg" name="category" value="Veg" className="accent-green-600" onChange={filterPizzas} />
                     <label htmlFor="Veg" className="text-gray-600">Veg</label>
                 </div>
 
                 <div className="flex items-center gap-2">
-                    <input
-                        type="radio"
-                        id="Non-Veg"
-                        name="category"
-                        value="Non-Veg"
-                        className="accent-red-600"
-                        onChange={filterPizzas}
-                    />
+                    <input type="radio" id="Non-Veg" name="category" value="Non-Veg" className="accent-red-600" onChange={filterPizzas} />
                     <label htmlFor="Non-Veg" className="text-gray-600">Non-Veg</label>
                 </div>
             </form>
+
             <div className="p-6 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
                 {pizzas.map((pizza) => (
-                    <div
-                        key={pizza._id}
-                        className="bg-white rounded-2xl shadow-md p-4 flex flex-col justify-between"
-                    >
-                        <img
-                            src={pizza.image_url}
-                            alt={pizza.name}
-                            className="w-full h-40 object-cover rounded-xl mb-3"
-                        />
+                    <div key={pizza._id} className="bg-white rounded-2xl shadow-md p-4 flex flex-col justify-between">
+                        <img src={pizza.image_url} alt={pizza.name} className="w-full h-40 object-cover rounded-xl mb-3" />
                         <h2 className="text-lg font-bold">{pizza.name}</h2>
                         <p className="text-sm text-gray-600">{pizza.description}</p>
                         <p className="text-sm mt-1">Category: {pizza.category}</p>
@@ -121,27 +103,53 @@ export default function ShowPizzasPage() {
                             <p>Medium: ₹{pizza.prices?.medium}</p>
                             <p>Large: ₹{pizza.prices?.large}</p>
                         </div>
-                        <div className="flex justify-between mt-4">
-                            {showUpdate && (
-                                <Link
-                                    to={`/pizzas/updatepizza/${pizza._id}`}
-                                    className="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded-md text-sm"
-                                >
-                                    Update
-                                </Link>
-                            )}
-                            {showDelete && (
+
+                        <div className="flex flex-col gap-2 mt-4">
+                            {/* Add to Cart Buttons for Different Sizes */}
+                            {["small", "medium", "large"].map(size => (
                                 <button
-                                    onClick={() => handleDelete(pizza._id)}
-                                    className="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded-md text-sm"
+                                    key={size}
+                                    onClick={() =>
+                                        addToCart({
+                                            isCustom: false,
+                                            pizzaRef: pizza._id,
+                                            modelRef: "PizzasModel",
+                                            name: `${pizza.name} (${size})`,
+                                            price: pizza.prices[size],
+                                            quantity: 1,
+                                            size
+                                        })
+                                    }
+                                    className="bg-yellow-500 hover:bg-yellow-600 text-white text-sm px-3 py-1 rounded-md"
                                 >
-                                    Delete
+                                    Add {size.charAt(0).toUpperCase() + size.slice(1)}
                                 </button>
-                            )}
+                            ))}
                         </div>
+
+                        {(showUpdate || showDelete) && (
+                            <div className="flex justify-between mt-4">
+                                {showUpdate && (
+                                    <Link
+                                        to={`/pizzas/updatepizza/${pizza._id}`}
+                                        className="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded-md text-sm"
+                                    >
+                                        Update
+                                    </Link>
+                                )}
+                                {showDelete && (
+                                    <button
+                                        onClick={() => handleDelete(pizza._id)}
+                                        className="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded-md text-sm"
+                                    >
+                                        Delete
+                                    </button>
+                                )}
+                            </div>
+                        )}
                     </div>
                 ))}
             </div>
         </>
-    )
+    );
 }

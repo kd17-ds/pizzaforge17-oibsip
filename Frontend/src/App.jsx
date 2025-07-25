@@ -15,63 +15,67 @@ import UpdateIngredientForm from './pages/adminPages/UpdateIngredientForm';
 import CreatePizzaPage from './pages/userPages/CreatePizzaPage';
 import UserCreatedPizzas from './pages/userPages/UserCreatedPizzas';
 import UpdateCustomizedPizza from './pages/userPages/UpdateCustomizedPizza';
+import CartPanel from './components/CartComponent';
 
 function App() {
     return (
-        <Routes>
-            <Route element={<MainLayout />}>
-                <Route path='/' element={<HomePage />} />
-                <Route path='/login' element={<Authentication formType='login' />} />
-                <Route path='/signup' element={<Authentication formType='signup' />} />
-                <Route path='/verifyemail' element={<VerifyEmail />} />
-                <Route path='/forgotpass' element={<ForgotPass />} />
-                <Route path='/showallpizzas' element={<ShowPizzasPage />} />
-                <Route path='/pizzas/updatepizza/:id' element={<UpdatePizzaForm />} />
-                <Route path='/customizepizza' element={<CreatePizzaPage />} />
-                <Route path='/allcustomizedpizza' element={<UserCreatedPizzas />} />
-                <Route path='/updatedcstpizza/:id' element={<UpdateCustomizedPizza />} />
-                <Route
-                    path="/admin/home"
-                    element={
-                        <AdminProtectedRoute>
-                            <AdminHomePage />
-                        </AdminProtectedRoute>
-                    }
-                />
-                <Route
-                    path="/admin/addpizza"
-                    element={
-                        <AdminProtectedRoute>
-                            <AddPizzasPage />
-                        </AdminProtectedRoute>
-                    }
-                />
-                <Route
-                    path="/admin/inventory"
-                    element={
-                        <AdminProtectedRoute>
-                            <InventoryManagementPage />
-                        </AdminProtectedRoute>
-                    }
-                />
-                <Route
-                    path="/admin/inventory/addingridient"
-                    element={
-                        <AdminProtectedRoute>
-                            <AddIngridientPage />
-                        </AdminProtectedRoute>
-                    }
-                />
-                <Route
-                    path="/admin/inventory/updateingridient/:id"
-                    element={
-                        <AdminProtectedRoute>
-                            <UpdateIngredientForm />
-                        </AdminProtectedRoute>
-                    }
-                />
-            </Route>
-        </Routes>
+        <>
+            <Routes>
+                <Route element={<MainLayout />}>
+                    <Route path='/' element={<HomePage />} />
+                    <Route path='/login' element={<Authentication formType='login' />} />
+                    <Route path='/signup' element={<Authentication formType='signup' />} />
+                    <Route path='/verifyemail' element={<VerifyEmail />} />
+                    <Route path='/forgotpass' element={<ForgotPass />} />
+                    <Route path='/showallpizzas' element={<ShowPizzasPage />} />
+                    <Route path='/pizzas/updatepizza/:id' element={<UpdatePizzaForm />} />
+                    <Route path='/customizepizza' element={<CreatePizzaPage />} />
+                    <Route path='/allcustomizedpizza' element={<UserCreatedPizzas />} />
+                    <Route path='/updatedcstpizza/:id' element={<UpdateCustomizedPizza />} />
+                    <Route
+                        path="/admin/home"
+                        element={
+                            <AdminProtectedRoute>
+                                <AdminHomePage />
+                            </AdminProtectedRoute>
+                        }
+                    />
+                    <Route
+                        path="/admin/addpizza"
+                        element={
+                            <AdminProtectedRoute>
+                                <AddPizzasPage />
+                            </AdminProtectedRoute>
+                        }
+                    />
+                    <Route
+                        path="/admin/inventory"
+                        element={
+                            <AdminProtectedRoute>
+                                <InventoryManagementPage />
+                            </AdminProtectedRoute>
+                        }
+                    />
+                    <Route
+                        path="/admin/inventory/addingridient"
+                        element={
+                            <AdminProtectedRoute>
+                                <AddIngridientPage />
+                            </AdminProtectedRoute>
+                        }
+                    />
+                    <Route
+                        path="/admin/inventory/updateingridient/:id"
+                        element={
+                            <AdminProtectedRoute>
+                                <UpdateIngredientForm />
+                            </AdminProtectedRoute>
+                        }
+                    />
+                </Route>
+            </Routes>
+            <CartPanel />
+        </>
     );
 }
 

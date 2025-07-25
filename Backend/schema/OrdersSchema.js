@@ -2,7 +2,7 @@ const { Schema } = require("mongoose");
 
 const OrdersSchema = new Schema({
   user: {
-    type: mongoose.Schema.Types.ObjectId,
+    type: Schema.Types.ObjectId,
     ref: "UsersModel",
     required: true,
   },
@@ -10,7 +10,7 @@ const OrdersSchema = new Schema({
     {
       isCustom: { type: Boolean, required: true },
       pizzaRef: {
-        type: mongoose.Schema.Types.ObjectId,
+        type: Schema.Types.ObjectId,
         refPath: "items.modelRef",
         required: true,
       },

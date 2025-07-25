@@ -13,6 +13,7 @@ const cookieParser = require("cookie-parser");
 const cors = require("cors");
 const authRoute = require("./routes/AuthRoutes");
 const pizzaRoute = require("./routes/PizzasRoutes");
+const orderRoute = require("./routes/OrderRoutes");
 const customizedPizzasRoute = require("./routes/CustomizedPizzaRoutes");
 
 app.use(express.static(path.join(__dirname, "client", "dist"))); // Serve frontend static files (like React build)
@@ -33,6 +34,7 @@ app.use(cookieParser());
 app.use("/", authRoute);
 app.use("/pizzas", pizzaRoute);
 app.use("/customized-pizzas", customizedPizzasRoute);
+app.use("/orders", orderRoute);
 
 main()
   .then((res) => {

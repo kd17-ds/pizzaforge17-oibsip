@@ -5,11 +5,13 @@ import { BASE_URL } from "../../constants/constants";
 import { useLoader } from "../../contexts/LoadingContext";
 import { useNotification } from "../../contexts/NotificationContext";
 import httpStatus from "http-status";
+import { useCart } from "../../contexts/CartContext";
 
 export default function CreatePizzaPage() {
     const { showNotification } = useNotification();
     const { showLoader, hideLoader } = useLoader();
     const [inventory, setInventory] = useState({});
+    const { addToCart } = useCart();
 
     const client = axios.create({
         baseURL: BASE_URL,
@@ -62,16 +64,30 @@ export default function CreatePizzaPage() {
                             <p><strong>Cheese:</strong> {pizza.cheese.name}</p>
                             <p><strong>Veggies:</strong> {pizza.veggies.map(v => v.name).join(", ")}</p>
                             <p><strong>Total Price:</strong> ₹{pizza.totalPrice}</p>
-                            <div className="flex gap-3 mt-4">
-                                <button className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700">
-                                    Place Order
+                            <div className="flex gap-3 mt-4 flex-wrap">
+                                <button
+                                    className="px-4 py-2 bg-yellow-600 text-white rounded hover:bg-yellow-700"
+                                    onClick={() =>
+                                        addToCart({
+                                            isCustom: true,
+                                            pizzaRef: pizza._id,
+                                            modelRef: "CreatedPizzaModel",
+                                            name: "Custom Pizza",
+                                            price: pizza.totalPrice,
+                                            quantity: 1,
+                                        })
+                                    }
+                                >
+                                    Add to Cart
                                 </button>
+
                                 <Link
                                     to={`/updatedcstpizza/${pizza._id}`}
                                     className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
                                 >
                                     Edit
                                 </Link>
+
                                 <button
                                     onClick={() => handleDelete(pizza._id)}
                                     className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700"
