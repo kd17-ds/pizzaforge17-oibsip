@@ -1,28 +1,25 @@
 import React from "react";
+import axios from "axios";
 import { useCart } from "../contexts/CartContext";
 import { BASE_URL } from "../constants/constants";
 import httpStatus from "http-status";
-import axios from "axios";
 import { useLoader } from "../contexts/LoadingContext";
 import { useNotification } from "../contexts/NotificationContext";
+
 export default function CartPanel() {
     const client = axios.create({
         baseURL: BASE_URL,
-        withCredentials: true
+        withCredentials: true,
     });
 
-    const { cartItems, removeFromCart, clearCart, setIsOpen } = useCart();
-    const isOpen = true; // force cart open always
+    const { cartItems, removeFromCart, clearCart, setIsOpen, isOpen } = useCart();
     const { showLoader, hideLoader } = useLoader();
     const { showNotification } = useNotification();
-
 
     const calculateTotal = (items) =>
         items.reduce((sum, item) => sum + item.price * item.quantity, 0);
 
     const placeOrder = async () => {
-
-
         try {
             showLoader();
 
@@ -38,9 +35,8 @@ export default function CartPanel() {
 
             const sanitizedCart = cartItems.map(item => ({
                 ...item,
-                modelRef: item.isCustom ? "CreatedPizzaModel" : "PizzasModel", // ✅ FIXED HERE
+                modelRef: item.isCustom ? "CreatedPizzaModel" : "PizzasModel",
             }));
-
 
             const payload = {
                 items: sanitizedCart,
@@ -49,17 +45,7 @@ export default function CartPanel() {
                 paymentMethod: "COD",
             };
 
-
-            console.table(cartItems.map(item => ({
-                name: item.name,
-                modelRef: item.modelRef,
-                isCustom: item.isCustom,
-            })));
-
-
-
             const res = await client.post("/orders/create", payload);
-            console.log("Order Response:", res.data);
 
             if (res.status === httpStatus.CREATED) {
                 showNotification("Order placed successfully!", "success");
@@ -67,7 +53,6 @@ export default function CartPanel() {
                 setIsOpen(false);
             }
         } catch (err) {
-            console.error("Place Order Error:", err);
             const message =
                 err?.response?.data?.message ||
                 err?.message ||
@@ -105,7 +90,8 @@ export default function CartPanel() {
                             <li key={idx} className="border p-2 rounded">
                                 <p>{item.name}</p>
                                 <p>Qty: {item.quantity}</p>
-                                <button className="text-red-500 text-sm" onClick={() => removeFromCart(item.pizzaRef)}>
+                                <p>Price: ₹{item.price}</p>
+                                <button onClick={() => removeFromCart(item)}>
                                     Remove
                                 </button>
                             </li>

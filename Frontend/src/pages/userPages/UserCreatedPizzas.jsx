@@ -58,7 +58,7 @@ export default function CreatePizzaPage() {
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                     {inventory.map((pizza) => (
                         <div key={pizza._id} className="bg-white p-4 rounded-xl shadow-md">
-                            <h2 className="text-xl font-bold mb-2">Custom Pizza</h2>
+                            <h2 className="text-xl font-bold mb-2"> {`Custom (${pizza.baseType.name.slice(0, 5)}, ${pizza.sauce.name.slice(0, 5)}, ${pizza.cheese.name.slice(0, 5)})`}</h2>
                             <p><strong>Base:</strong> {pizza.baseType.name}</p>
                             <p><strong>Sauce:</strong> {pizza.sauce.name}</p>
                             <p><strong>Cheese:</strong> {pizza.cheese.name}</p>
@@ -72,7 +72,7 @@ export default function CreatePizzaPage() {
                                             isCustom: true,
                                             pizzaRef: pizza._id,
                                             modelRef: "CreatedPizzaModel",
-                                            name: "Custom Pizza",
+                                            name: `Custom (${pizza.baseType.name.slice(0, 5)}, ${pizza.sauce.name.slice(0, 5)}, ${pizza.cheese.name.slice(0, 5)})`,
                                             price: pizza.totalPrice,
                                             quantity: 1,
                                         })

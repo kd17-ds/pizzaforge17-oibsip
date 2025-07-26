@@ -16,8 +16,17 @@ import CreatePizzaPage from './pages/userPages/CreatePizzaPage';
 import UserCreatedPizzas from './pages/userPages/UserCreatedPizzas';
 import UpdateCustomizedPizza from './pages/userPages/UpdateCustomizedPizza';
 import CartPanel from './components/CartComponent';
+import { useLocation } from 'react-router-dom';
 
 function App() {
+    const location = useLocation();
+
+    const showCartOnRoutes = [
+        "/showallpizzas",
+        "/allcustomizedpizza",
+    ];
+
+    const shouldShowCart = showCartOnRoutes.includes(location.pathname);
     return (
         <>
             <Routes>
@@ -74,7 +83,7 @@ function App() {
                     />
                 </Route>
             </Routes>
-            <CartPanel />
+            {shouldShowCart && <CartPanel />}
         </>
     );
 }

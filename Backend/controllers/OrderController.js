@@ -5,6 +5,7 @@ const SauceModel = require("../models/SauceModel");
 const CheeseModel = require("../models/CheeseModel");
 const VeggieModel = require("../models/VeggieModel");
 const PizzasModel = require("../models/PizzasModel");
+const CartModel = require("../models/CartModel");
 
 module.exports.CreateOrder = async (req, res) => {
   try {
@@ -28,13 +29,19 @@ module.exports.CreateOrder = async (req, res) => {
     }
 
     for (const item of items) {
+      const qty = item.quantity || 1;
+
+      if (!qty || qty < 1) {
+        return res
+          .status(400)
+          .json({ message: "Invalid quantity for an item." });
+      }
+
       if (item.isCustom) {
         const pizza = await CreatedPizzaModel.findById(item.pizzaRef);
         if (!pizza) {
           return res.status(400).json({ message: "Invalid customized pizza" });
         }
-
-        const qty = item.quantity || 1;
 
         const base = await BaseModel.findOne({ name: pizza.baseType.name });
         if (!base || base.availableQty < qty) {
@@ -99,6 +106,8 @@ module.exports.CreateOrder = async (req, res) => {
       status,
     });
 
+    await CartModel.deleteOne({ userId: req.user._id });
+
     res.status(201).json({
       message: "Order placed successfully",
       data: newOrder,
@@ -130,5 +139,51 @@ module.exports.GetOrderById = async (req, res) => {
     res.status(200).json(order);
   } catch (err) {
     res.status(500).json({ message: err.message });
+  }
+};
+
+module.exports.GetCart = async (req, res) => {
+  try {
+    const userId = req.user._id;
+    let cart = await CartModel.findOne({ userId });
+
+    if (!cart) {
+      return res.status(200).json({ items: [] });
+    }
+
+    return res.status(200).json(cart);
+  } catch (err) {
+    console.error("Error fetching cart:", err);
+    return res.status(500).json({ message: "Server Error" });
+  }
+};
+
+module.exports.UpdateOrCreateCart = async (req, res) => {
+  try {
+    const userId = req.user._id;
+    const { items } = req.body;
+
+    if (!items || !Array.isArray(items)) {
+      return res.status(400).json({ message: "Cart items must be an array." });
+    }
+
+    const updatedCart = await CartModel.findOneAndUpdate(
+      { userId },
+      {
+        $set: {
+          items,
+          updatedAt: Date.now(),
+        },
+      },
+      { new: true, upsert: true }
+    );
+
+    return res.status(200).json({
+      message: "Cart updated successfully",
+      cart: updatedCart,
+    });
+  } catch (err) {
+    console.error("Update/Create Cart Error:", err);
+    return res.status(500).json({ message: "Server error updating cart" });
   }
 };
