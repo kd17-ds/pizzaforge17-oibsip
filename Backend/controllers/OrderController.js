@@ -120,25 +120,80 @@ module.exports.CreateOrder = async (req, res) => {
 
 module.exports.GetUserOrders = async (req, res) => {
   try {
-    const orders = await OrderModel.find({ user: req.user._id }).populate(
-      "items.pizzaRef"
-    );
-    res.status(200).json(orders);
+    if (!req.user) {
+      return res.status(401).json({ message: "Not logged in" });
+    }
+
+    const rawOrders = await OrderModel.find({ user: req.user._id });
+
+    const populatedOrders = [];
+
+    for (const order of rawOrders) {
+      const populatedItems = [];
+
+      for (const item of order.items) {
+        let pizzaDoc = null;
+
+        if (item.modelRef === "Pizza") {
+          pizzaDoc = await PizzasModel.findById(item.pizzaRef);
+        } else if (item.modelRef === "CreatedPizza") {
+          pizzaDoc = await CreatedPizzasModel.findById(item.pizzaRef);
+        }
+
+        populatedItems.push({
+          ...item.toObject(),
+          pizzaRef: pizzaDoc,
+        });
+      }
+
+      populatedOrders.push({
+        ...order.toObject(),
+        items: populatedItems,
+      });
+    }
+
+    res.status(200).json(populatedOrders);
   } catch (err) {
-    res.status(500).json({ message: err.message });
+    console.error("GetUserOrders error:", err);
+    res.status(500).json({ message: "Failed to fetch user orders" });
   }
 };
 
 module.exports.GetOrderById = async (req, res) => {
   try {
     const { id } = req.params;
-    const order = await OrderModel.findById(id).populate("items.pizzaRef");
-    if (!order) {
+
+    const rawOrder = await OrderModel.findById(id);
+    if (!rawOrder) {
       return res.status(404).json({ message: "Order not found" });
     }
-    res.status(200).json(order);
+
+    const populatedItems = [];
+
+    for (const item of rawOrder.items) {
+      let pizzaDoc = null;
+
+      if (item.modelRef === "Pizza") {
+        pizzaDoc = await PizzasModel.findById(item.pizzaRef);
+      } else if (item.modelRef === "CreatedPizza") {
+        pizzaDoc = await CreatedPizzasModel.findById(item.pizzaRef);
+      }
+
+      populatedItems.push({
+        ...item.toObject(),
+        pizzaRef: pizzaDoc,
+      });
+    }
+
+    const populatedOrder = {
+      ...rawOrder.toObject(),
+      items: populatedItems,
+    };
+
+    res.status(200).json(populatedOrder);
   } catch (err) {
-    res.status(500).json({ message: err.message });
+    console.error("GetOrderById error:", err);
+    res.status(500).json({ message: "Failed to fetch order" });
   }
 };
 

@@ -49,10 +49,8 @@ export default function ShowPizzasPage() {
     }
 
     useEffect(() => {
-        if (user) {
-            fetchData();
-        }
-    }, [user, filter]);
+        fetchData();
+    }, [filter]);
 
     const filterPizzas = (e) => {
         setFilter(e.target.value);

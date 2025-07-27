@@ -2,13 +2,17 @@ import { createContext, useContext, useEffect, useState } from "react";
 import axios from "axios";
 import { BASE_URL } from "../constants/constants";
 import { useLocation } from "react-router-dom";
+import { useAuth } from "../hooks/useAuth";
+import { useLoader } from "../contexts/LoadingContext";
 
 const CartContext = createContext();
 export const useCart = () => useContext(CartContext);
 
 export const CartProvider = ({ children }) => {
+    const { user, loading } = useAuth();
     const [cartItems, setCartItems] = useState([]);
     const location = useLocation();
+    const { showLoader, hideLoader } = useLoader();
 
     const initiallyOpenPages = ["/showallpizzas", "/allcustomizedpizza"];
     const [isOpen, setIsOpen] = useState(
@@ -21,6 +25,8 @@ export const CartProvider = ({ children }) => {
     });
 
     useEffect(() => {
+        if (!user) return;
+
         const fetchCart = async () => {
             try {
                 const res = await client.get("/orders/cart");
@@ -97,6 +103,15 @@ export const CartProvider = ({ children }) => {
         setCartItems([]);
         await syncCartToBackend([]);
     };
+
+    useEffect(() => {
+        if (loading) showLoader();
+        else hideLoader();
+    }, [loading]);
+
+    if (loading) {
+        return null;
+    }
 
     return (
         <CartContext.Provider
