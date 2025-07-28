@@ -6,6 +6,8 @@ const CheeseModel = require("../models/CheeseModel");
 const VeggieModel = require("../models/VeggieModel");
 const PizzasModel = require("../models/PizzasModel");
 const CartModel = require("../models/CartModel");
+const { sendEmail } = require("../utils/sendEmail");
+const checkAndAlertLowStock = require("../utils/checkAndAlertLowStock");
 
 module.exports.CreateOrder = async (req, res) => {
   try {
@@ -51,6 +53,7 @@ module.exports.CreateOrder = async (req, res) => {
         }
         base.availableQty -= qty;
         await base.save();
+        await checkAndAlertLowStock(base, "Base");
 
         const sauce = await SauceModel.findOne({ name: pizza.sauce.name });
         if (!sauce || sauce.availableQty < qty) {
@@ -60,6 +63,7 @@ module.exports.CreateOrder = async (req, res) => {
         }
         sauce.availableQty -= qty;
         await sauce.save();
+        await checkAndAlertLowStock(sauce, "Sauce");
 
         const cheese = await CheeseModel.findOne({ name: pizza.cheese.name });
         if (!cheese || cheese.availableQty < qty) {
@@ -69,6 +73,7 @@ module.exports.CreateOrder = async (req, res) => {
         }
         cheese.availableQty -= qty;
         await cheese.save();
+        await checkAndAlertLowStock(cheese, "Cheese");
 
         for (const veg of pizza.veggies) {
           const veggie = await VeggieModel.findOne({ name: veg.name });
@@ -79,6 +84,7 @@ module.exports.CreateOrder = async (req, res) => {
           }
           veggie.availableQty -= qty;
           await veggie.save();
+          await checkAndAlertLowStock(veggie, "Veggie");
         }
       } else {
         const pizza = await PizzasModel.findById(item.pizzaRef);
@@ -107,6 +113,35 @@ module.exports.CreateOrder = async (req, res) => {
     });
 
     await CartModel.deleteOne({ userId: req.user._id });
+
+    const userEmail = req.user.email;
+    const userName = req.user.username;
+
+    const emailContent = `
+                    <h2>Hi ${userName},</h2>
+                    <p>Your order has been placed successfully!</p>
+                    <p><strong>Order ID:</strong> ${newOrder._id}</p>
+                    <p><strong>Total:</strong> ₹${newOrder.totalPrice}</p>
+                    <p><strong>Shipping To:</strong> ${newOrder.shippingAddress.street}, ${newOrder.shippingAddress.city} - ${newOrder.shippingAddress.pincode}</p>
+                    <p>We'll notify you once it’s out for delivery 🍕</p>
+                    <br/>
+                    <p>Thanks for ordering with us!</p>
+                      `;
+
+    sendEmail(userEmail, "Order Confirmation - Pizza App", emailContent);
+
+    const adminEmail = process.env.ADMIN_EMAIL;
+    const adminContent = `
+                      <h2>New Order Received</h2>
+                      <p><strong>User:</strong> ${userName} (${userEmail})</p>
+                      <p><strong>Order ID:</strong> ${newOrder._id}</p>
+                      <p><strong>Total:</strong> ₹${newOrder.totalPrice}</p>
+                      <p><strong>Shipping Address:</strong> ${newOrder.shippingAddress.street}, ${newOrder.shippingAddress.city} - ${newOrder.shippingAddress.pincode}</p>
+                      <p><strong>Status:</strong> ${newOrder.status}</p>
+                      <p><strong>Payment:</strong> ${newOrder.paymentStatus} via ${newOrder.paymentMethod}</p>
+                    `;
+
+    sendEmail(adminEmail, "📦 New Pizza Order Received", adminContent);
 
     res.status(201).json({
       message: "Order placed successfully",
@@ -137,7 +172,7 @@ module.exports.GetUserOrders = async (req, res) => {
         if (item.modelRef === "Pizza") {
           pizzaDoc = await PizzasModel.findById(item.pizzaRef);
         } else if (item.modelRef === "CreatedPizza") {
-          pizzaDoc = await CreatedPizzasModel.findById(item.pizzaRef);
+          pizzaDoc = await CreatedPizzaModel.findById(item.pizzaRef);
         }
 
         populatedItems.push({
@@ -176,7 +211,7 @@ module.exports.GetOrderById = async (req, res) => {
       if (item.modelRef === "Pizza") {
         pizzaDoc = await PizzasModel.findById(item.pizzaRef);
       } else if (item.modelRef === "CreatedPizza") {
-        pizzaDoc = await CreatedPizzasModel.findById(item.pizzaRef);
+        pizzaDoc = await CreatedPizzaModel.findById(item.pizzaRef);
       }
 
       populatedItems.push({
@@ -240,5 +275,95 @@ module.exports.UpdateOrCreateCart = async (req, res) => {
   } catch (err) {
     console.error("Update/Create Cart Error:", err);
     return res.status(500).json({ message: "Server error updating cart" });
+  }
+};
+
+module.exports.GetAllOrders = async (req, res) => {
+  try {
+    const rawOrders = await OrderModel.find()
+      .populate("user")
+      .sort({ createdAt: -1 });
+
+    const populatedOrders = [];
+
+    for (const order of rawOrders) {
+      const populatedItems = [];
+
+      for (const item of order.items) {
+        let pizzaDoc = null;
+
+        if (item.modelRef === "PizzasModel") {
+          pizzaDoc = await PizzasModel.findById(item.pizzaRef);
+        }
+
+        populatedItems.push({
+          ...item.toObject(),
+          pizzaRef: pizzaDoc,
+        });
+      }
+
+      populatedOrders.push({
+        ...order.toObject(),
+        items: populatedItems,
+      });
+    }
+
+    res.status(200).json(populatedOrders);
+  } catch (err) {
+    console.error("GetAllOrders error:", err);
+    res.status(500).json({ message: "Failed to fetch all orders" });
+  }
+};
+
+module.exports.UpdateOrderStatus = async (req, res) => {
+  try {
+    const { status } = req.body;
+    const order = await OrderModel.findById(req.params.id).populate("user");
+
+    if (!order) return res.status(404).json({ message: "Order not found" });
+
+    order.status = status;
+    await order.save();
+
+    const adminEmail = process.env.ADMIN_EMAIL;
+    const statusUpdateContent = `
+      <h2>Order Status Updated</h2>
+      <p><strong>Order ID:</strong> ${order._id}</p>
+      <p><strong>New Status:</strong> ${status}</p>
+    `;
+    if (adminEmail) {
+      sendEmail(
+        adminEmail,
+        "🔄 Pizza Order Status Changed",
+        statusUpdateContent
+      );
+    }
+
+    const userEmail = order.user?.email;
+    const userName = order.user?.username;
+
+    if (userEmail) {
+      const statusUpdateContentUser = `
+        <h2>Hi ${userName || "Customer"},</h2>
+        <p>Your order <strong>${order._id}</strong> status has been updated.</p>
+        <p><strong>New Status:</strong> ${status}</p>
+        <p>We'll keep you posted as your delicious pizza gets closer to you! 🍕</p>
+        <br/>
+        <p>Thanks for ordering with us!</p>
+      `;
+      sendEmail(
+        userEmail,
+        "📦 Your Pizza Order Status Has Changed",
+        statusUpdateContentUser
+      );
+    } else {
+      console.warn("⚠️ No user email found — skipping email to customer.");
+    }
+
+    res.status(200).json({ message: "Order status updated", data: order });
+  } catch (err) {
+    res
+      .status(500)
+      .json({ message: "Failed to update status", error: err.message });
   }
 };

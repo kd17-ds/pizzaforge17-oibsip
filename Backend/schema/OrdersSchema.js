@@ -3,7 +3,7 @@ const { Schema } = require("mongoose");
 const OrdersSchema = new Schema({
   user: {
     type: Schema.Types.ObjectId,
-    ref: "UsersModel",
+    ref: "User",
     required: true,
   },
   items: [

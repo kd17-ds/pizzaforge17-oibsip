@@ -11,6 +11,7 @@ import UpdateCustomizedPizza from './pages/userPages/UpdateCustomizedPizza';
 import ShowAllOrdersPage from './pages/userPages/ShowAllOrdersPage';
 import SingleOrderPage from './pages/userPages/SIngleOrderPage';
 import AdminHomePage from './pages/adminPages/AdminHomePage';
+import AdminOrdersPage from './pages/adminPages/AdminOrdersPage';
 import AddPizzasPage from './pages/adminPages/AddPizzasPage';
 import UpdatePizzaForm from './pages/adminPages/UpdatePizzaForm';
 import InventoryManagementPage from './pages/adminPages/InventoryManagementPage';
@@ -132,6 +133,14 @@ function App() {
                         element={
                             <AdminProtectedRoute>
                                 <UpdatePizzaForm />
+                            </AdminProtectedRoute>
+                        }
+                    />
+                    <Route
+                        path="/admin/allorders"
+                        element={
+                            <AdminProtectedRoute>
+                                <AdminOrdersPage />
                             </AdminProtectedRoute>
                         }
                     />
