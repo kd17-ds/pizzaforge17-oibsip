@@ -25,7 +25,7 @@ export const CartProvider = ({ children }) => {
     });
 
     useEffect(() => {
-        if (!user) return;
+        if (loading || !user) return;
 
         const fetchCart = async () => {
             try {
@@ -39,7 +39,7 @@ export const CartProvider = ({ children }) => {
         };
 
         fetchCart();
-    }, []);
+    }, [user, loading]);
 
     // Helper to sync cart with backend
     const syncCartToBackend = async (updatedCartItems) => {

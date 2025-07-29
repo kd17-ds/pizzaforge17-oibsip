@@ -8,6 +8,88 @@ const PizzasModel = require("../models/PizzasModel");
 const CartModel = require("../models/CartModel");
 const { sendEmail } = require("../utils/sendEmail");
 const checkAndAlertLowStock = require("../utils/checkAndAlertLowStock");
+const Razorpay = require("razorpay");
+const crypto = require("crypto");
+
+let razorpay = null;
+
+if (process.env.RAZORPAY_KEY_ID && process.env.RAZORPAY_SECRET) {
+  razorpay = new Razorpay({
+    key_id: process.env.RAZORPAY_KEY_ID,
+    key_secret: process.env.RAZORPAY_SECRET,
+  });
+}
+
+// Create Order route
+// module.exports.CreateRazorpayOrder = async (req, res) => {
+//   const { amount } = req.body;
+
+//   const options = {
+//     amount: amount * 100,
+//     currency: "INR",
+//     receipt: `receipt_order_${Date.now()}`,
+//   };
+
+//   if (!razorpay) {
+//     return res
+//       .status(503)
+//       .json({ message: "Razorpay not initialized yet. Try again later." });
+//   }
+
+//   try {
+//     const order = await razorpay.orders.create(options);
+//     res.status(200).json(order);
+//   } catch (err) {
+//     res
+//       .status(500)
+//       .json({ message: "Failed to create Razorpay order", error: err.message });
+//   }
+// };
+
+// Fake CreateRazorpayOrder for development
+module.exports.CreateRazorpayOrder = async (req, res) => {
+  const fakeOrder = {
+    id: "fake_order_id_123",
+    amount: req.body.amount * 100,
+    currency: "INR",
+    status: "created",
+  };
+
+  res.status(200).json(fakeOrder);
+};
+
+module.exports.PlaceOrderAfterPayment = async (req, res) => {
+  try {
+    const { items, totalPrice, shippingAddress, razorpayDetails } = req.body;
+
+    // map Razorpay details
+    const paymentId = razorpayDetails.razorpay_payment_id;
+    const paymentDate = new Date(); // now
+    const paymentMethod = "Razorpay";
+    const paymentStatus = "Paid"; // since Razorpay confirms payment
+    const status = "Placed";
+
+    // Call your existing logic (or extract it to a reusable function)
+    return await module.exports.CreateOrder(
+      {
+        ...req,
+        body: {
+          items,
+          totalPrice,
+          shippingAddress,
+          paymentMethod,
+          paymentStatus,
+          paymentId,
+          paymentDate,
+          status,
+        },
+      },
+      res
+    );
+  } catch (err) {
+    return res.status(500).json({ message: err.message || "Order failed" });
+  }
+};
 
 module.exports.CreateOrder = async (req, res) => {
   try {
