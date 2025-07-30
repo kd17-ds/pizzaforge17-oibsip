@@ -42,7 +42,7 @@ const OrdersSchema = new Schema({
 
   paymentMethod: {
     type: String,
-    enum: ["COD", "Online"],
+    enum: ["Cash on Delivery", "Razorpay"],
     required: true,
   },
   paymentStatus: {

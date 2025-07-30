@@ -26,27 +26,27 @@ export default function CartPanel() {
         landmark: "",
     });
 
+    const razorpayKey = import.meta.env.VITE_RAZORPAY_KEY_ID;
+
     const calculateTotal = (items) =>
         items.reduce((sum, item) => sum + item.price * item.quantity, 0);
 
-    const razorpayKey = "fake_key"; // <-- Replace with your actual test key
+    const sanitizeCart = () => {
+        return cartItems.map(item => ({
+            ...item,
+            modelRef: item.isCustom ? "CreatedPizzaModel" : "PizzasModel",
+        }));
+    };
 
-    const placeOrder = async (e) => {
-        e.preventDefault();
+    const placeOrderWithRazorpay = async () => {
         showLoader();
-
         try {
             const total = calculateTotal(cartItems);
-            const sanitizedCart = cartItems.map(item => ({
-                ...item,
-                modelRef: item.isCustom ? "CreatedPizzaModel" : "PizzasModel",
-            }));
+            const sanitizedCart = sanitizeCart();
 
-            // Step 1: Create Razorpay Order
             const orderRes = await client.post("/orders/razorpay", { amount: total });
             const { id: razorpayOrderId, amount } = orderRes.data;
 
-            // Step 2: Open Razorpay Checkout
             const options = {
                 key: razorpayKey,
                 amount,
@@ -55,19 +55,21 @@ export default function CartPanel() {
                 description: "Order Payment",
                 order_id: razorpayOrderId,
                 handler: async function (response) {
-                    // Step 3: Send final order placement to backend
-                    const payload = {
-                        items: sanitizedCart,
-                        totalPrice: total,
-                        shippingAddress,
-                        razorpayDetails: response,
-                    };
-
-                    const finalRes = await client.post("/orders/razorpay/placeorder", payload);
-                    if (finalRes.status === httpStatus.CREATED) {
-                        showNotification("Order placed successfully!", "success");
-                        clearCart();
-                        setIsOpen(false);
+                    try {
+                        const payload = {
+                            items: sanitizedCart,
+                            totalPrice: total,
+                            shippingAddress,
+                            razorpayDetails: response,
+                        };
+                        const finalRes = await client.post("/orders/razorpay/placeorder", payload);
+                        if (finalRes.status === httpStatus.CREATED) {
+                            showNotification("Order placed successfully!", "success");
+                            clearCart();
+                            setIsOpen(false);
+                        }
+                    } catch (err) {
+                        showNotification("Payment succeeded but order failed. Contact support.", "error");
                     }
                 },
                 prefill: {
@@ -83,7 +85,36 @@ export default function CartPanel() {
             const message =
                 err?.response?.data?.message ||
                 err?.message ||
-                "An error occurred while placing the order";
+                "Failed to initiate Razorpay order";
+            showNotification(message, "error");
+        } finally {
+            hideLoader();
+        }
+    };
+
+    const placeOrderWithCOD = async () => {
+        showLoader();
+        try {
+            const total = calculateTotal(cartItems);
+            const sanitizedCart = sanitizeCart();
+
+            const payload = {
+                items: sanitizedCart,
+                totalPrice: total,
+                shippingAddress,
+            };
+
+            const res = await client.post("/orders/cod/placeorder", payload);
+            if (res.status === httpStatus.CREATED) {
+                showNotification("Order placed with Cash on Delivery!", "success");
+                clearCart();
+                setIsOpen(false);
+            }
+        } catch (err) {
+            const message =
+                err?.response?.data?.message ||
+                err?.message ||
+                "Failed to place COD order";
             showNotification(message, "error");
         } finally {
             hideLoader();
@@ -126,7 +157,7 @@ export default function CartPanel() {
                         ))}
                     </ul>
 
-                    <form onSubmit={placeOrder} className="mt-4 space-y-2">
+                    <form className="mt-4 space-y-2">
                         <p className="font-semibold">Total: ₹{calculateTotal(cartItems)}</p>
 
                         <h3 className="font-semibold">Shipping Address</h3>
@@ -159,9 +190,22 @@ export default function CartPanel() {
                             onChange={(e) => setShippingAddress({ ...shippingAddress, pincode: e.target.value })}
                         />
 
-                        <button type="submit" className="w-full mt-2 bg-green-600 text-white px-4 py-2 rounded hover:cursor-pointer hover:bg-green-700">
-                            Place Order
+                        <button
+                            type="button"
+                            onClick={placeOrderWithRazorpay}
+                            className="w-full mt-2 bg-green-600 text-white px-4 py-2 rounded hover:cursor-pointer hover:bg-green-700"
+                        >
+                            Pay with Razorpay
                         </button>
+
+                        <button
+                            type="button"
+                            onClick={placeOrderWithCOD}
+                            className="w-full mt-2 bg-gray-700 text-white px-4 py-2 rounded hover:cursor-pointer hover:bg-gray-800"
+                        >
+                            Cash on Delivery
+                        </button>
+
                         <button type="button" onClick={clearCart} className="w-full mt-2 text-red-600 text-sm hover:underline">
                             Clear Cart
                         </button>

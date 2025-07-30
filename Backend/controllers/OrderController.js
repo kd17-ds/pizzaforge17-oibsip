@@ -20,42 +20,29 @@ if (process.env.RAZORPAY_KEY_ID && process.env.RAZORPAY_SECRET) {
   });
 }
 
-// Create Order route
-// module.exports.CreateRazorpayOrder = async (req, res) => {
-//   const { amount } = req.body;
-
-//   const options = {
-//     amount: amount * 100,
-//     currency: "INR",
-//     receipt: `receipt_order_${Date.now()}`,
-//   };
-
-//   if (!razorpay) {
-//     return res
-//       .status(503)
-//       .json({ message: "Razorpay not initialized yet. Try again later." });
-//   }
-
-//   try {
-//     const order = await razorpay.orders.create(options);
-//     res.status(200).json(order);
-//   } catch (err) {
-//     res
-//       .status(500)
-//       .json({ message: "Failed to create Razorpay order", error: err.message });
-//   }
-// };
-
-// Fake CreateRazorpayOrder for development
 module.exports.CreateRazorpayOrder = async (req, res) => {
-  const fakeOrder = {
-    id: "fake_order_id_123",
-    amount: req.body.amount * 100,
+  const { amount } = req.body;
+
+  const options = {
+    amount: amount * 100,
     currency: "INR",
-    status: "created",
+    receipt: `receipt_order_${Date.now()}`,
   };
 
-  res.status(200).json(fakeOrder);
+  if (!razorpay) {
+    return res
+      .status(503)
+      .json({ message: "Razorpay not initialized yet. Try again later." });
+  }
+
+  try {
+    const order = await razorpay.orders.create(options);
+    res.status(200).json(order);
+  } catch (err) {
+    res
+      .status(500)
+      .json({ message: "Failed to create Razorpay order", error: err.message });
+  }
 };
 
 module.exports.PlaceOrderAfterPayment = async (req, res) => {
@@ -88,6 +75,31 @@ module.exports.PlaceOrderAfterPayment = async (req, res) => {
     );
   } catch (err) {
     return res.status(500).json({ message: err.message || "Order failed" });
+  }
+};
+
+module.exports.PlaceOrderCOD = async (req, res) => {
+  try {
+    const { items, totalPrice, shippingAddress } = req.body;
+
+    return await module.exports.CreateOrder(
+      {
+        ...req,
+        body: {
+          items,
+          totalPrice,
+          shippingAddress,
+          paymentMethod: "Cash on Delivery",
+          paymentStatus: "Pending",
+          paymentId: null,
+          paymentDate: null,
+          status: "Placed",
+        },
+      },
+      res
+    );
+  } catch (err) {
+    return res.status(500).json({ message: err.message || "COD order failed" });
   }
 };
 
