@@ -5,6 +5,7 @@ const {
   ForgotPass,
   ResetPass,
   VerifyUserFromCookie,
+  LogoutUser,
 } = require("../controllers/AuthControllers");
 const router = require("express").Router(); // Create a new router object from Express
 const { userVerification } = require("../middlewares/AuthMiddleWare");
@@ -16,5 +17,6 @@ router.get("/verifyemail", VerifyEmail);
 router.post("/forgotpass", ForgotPass);
 router.post("/resetpass", ResetPass);
 router.get("/verifyUser", VerifyUserFromCookie);
+router.get("/logout", LogoutUser);
 
 module.exports = router;

@@ -198,3 +198,16 @@ module.exports.VerifyUserFromCookie = async (req, res) => {
     return res.json({ status: false });
   }
 };
+
+module.exports.LogoutUser = (req, res) => {
+  res.clearCookie("token", {
+    httpOnly: true,
+    sameSite: "Lax",
+    secure: process.env.NODE_ENV === "production",
+  });
+
+  return res.status(200).json({
+    success: true,
+    message: "User logged out successfully",
+  });
+};

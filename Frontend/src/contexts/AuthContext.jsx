@@ -90,6 +90,17 @@ const AuthProvider = ({ children }) => {
             return { success: false, message: err.response?.data?.message || "Login failed." };
         }
     }
+    const handleLogout = async () => {
+        try {
+            const res = await client.get("/logout");
+            if (res.status === httpStatus.OK) {
+                setUser(null);
+            }
+        } catch (err) {
+            console.error("Logout failed:", err);
+        }
+    };
+
 
     const data = {
         user,
@@ -97,6 +108,7 @@ const AuthProvider = ({ children }) => {
         loading,
         handleRegister,
         handleLogin,
+        handleLogout,
     };
 
     return <AuthContext.Provider value={data}>{children}</AuthContext.Provider>;
