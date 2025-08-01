@@ -92,7 +92,7 @@ export default function Authentication({ formType }) {
 
 
     return (
-        <div className="min-h-screen flex items-center justify-center bg-gray-100 px-4 lg:pb-0 pb-10">
+        <div className="min-h-[calc(100vh-225px)] pt-[75px] flex items-center justify-center px-4 ">
             <div className="w-full max-w-md bg-white p-8 rounded shadow">
                 <div className="flex flex-col items-center">
                     <div className="bg-sec text-white p-4 rounded-full mb-4">
@@ -170,7 +170,7 @@ export default function Authentication({ formType }) {
                         <button
                             type="button"
                             onClick={handleAuth}
-                            className="w-full bg-sec text-white py-2 rounded hover:bg-lite transition hover:cursor-pointer"
+                            className="w-full bg-sec text-white py-2 rounded hover:bg-primary transition hover:cursor-pointer"
                         >
                             {formState === 0 ? "Login" : "Register"}
                         </button>

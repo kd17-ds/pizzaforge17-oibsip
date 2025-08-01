@@ -74,80 +74,117 @@ export default function ShowPizzasPage() {
     };
 
     return (
-        <>
-            <form className="flex flex-col sm:flex-row items-center gap-4 bg-white p-4 rounded-lg shadow-md">
-                <p className="text-lg font-medium text-gray-700">Filter:</p>
+        <div className="bg-lite text-sec md:px-20 py-16">
+            <h1 className="text-3xl sm:text-4xl font-bold text-center mb-6 text-[var(--color-primary)]">
+                Explore Our Delicious Pizzas
+            </h1>
+            {/* Filter Buttons */}
+            <div className="flex justify-center gap-4 mb-10">
+                {["All", "Veg", "Non-Veg"].map((type) => (
+                    <button
+                        key={type}
+                        onClick={() => setFilter(type === "All" ? "" : type)}
+                        className={`px-5 py-2 rounded-full text-sm font-semibold border transition-all duration-200 
+          ${filter === type || (filter === "" && type === "All")
+                                ? "bg-[var(--color-primary)] text-white border-[var(--color-primary)]"
+                                : "border-gray-300 hover:bg-[var(--color-lite)]"
+                            }`}
+                    >
+                        {type}
+                    </button>
+                ))}
+            </div>
 
-                <div className="flex items-center gap-2">
-                    <input type="radio" id="Veg" name="category" value="Veg" className="accent-green-600" onChange={filterPizzas} />
-                    <label htmlFor="Veg" className="text-gray-600">Veg</label>
-                </div>
-
-                <div className="flex items-center gap-2">
-                    <input type="radio" id="Non-Veg" name="category" value="Non-Veg" className="accent-red-600" onChange={filterPizzas} />
-                    <label htmlFor="Non-Veg" className="text-gray-600">Non-Veg</label>
-                </div>
-            </form>
-
-            <div className="p-6 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+            {/* Pizza Grid */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-8 px-6 mt-10">
                 {pizzas.map((pizza) => (
-                    <div key={pizza._id} className="bg-white rounded-2xl shadow-md p-4 flex flex-col justify-between">
-                        <img src={pizza.image_url} alt={pizza.name} className="w-full h-40 object-cover rounded-xl mb-3" />
-                        <h2 className="text-lg font-bold">{pizza.name}</h2>
-                        <p className="text-sm text-gray-600">{pizza.description}</p>
-                        <p className="text-sm mt-1">Category: {pizza.category}</p>
-                        <div className="mt-2 text-sm text-gray-700">
-                            <p>Small: ₹{pizza.prices?.small}</p>
-                            <p>Medium: ₹{pizza.prices?.medium}</p>
-                            <p>Large: ₹{pizza.prices?.large}</p>
-                        </div>
-
-                        <div className="flex flex-col gap-2 mt-4">
-                            {/* Add to Cart Buttons for Different Sizes */}
-                            {["small", "medium", "large"].map(size => (
-                                <button
-                                    key={size}
-                                    onClick={() =>
-                                        addToCart({
-                                            isCustom: false,
-                                            pizzaRef: pizza._id,
-                                            modelRef: "PizzasModel",
-                                            name: `${pizza.name} (${size})`,
-                                            price: pizza.prices[size],
-                                            quantity: 1,
-                                            size
-                                        })
-                                    }
-                                    className="bg-yellow-500 hover:bg-yellow-600 text-white text-sm px-3 py-1 rounded-md"
+                    <div
+                        key={pizza._id}
+                        className="bg-lite backdrop-blur-sm border border-[var(--color-lite)] rounded-2xl shadow-md hover:shadow-lg transition duration-300 overflow-hidden flex flex-col"
+                    >
+                        {/* Pizza Image + Overlay */}
+                        <div className="relative h-36 w-full overflow-hidden">
+                            <img
+                                src={pizza.image_url}
+                                alt={pizza.name}
+                                className="h-full w-full object-cover"
+                            />
+                            <div className="absolute bottom-0 w-full bg-black/40 text-white px-3 py-2 backdrop-blur-sm flex justify-between items-center text-xs sm:text-sm">
+                                <h2 className="font-bold">{pizza.name}</h2>
+                                <span
+                                    className={`font-medium flex items-center gap-1 ${pizza.category === "Veg" ? "text-green-400" : "text-red-400"
+                                        }`}
                                 >
-                                    Add {size.charAt(0).toUpperCase() + size.slice(1)}
-                                </button>
-                            ))}
+                                    <span className="text-lg leading-none">
+                                        {pizza.category === "Veg" ? "🟢" : "🔴"}
+                                    </span>
+                                    {pizza.category}
+                                </span>
+                            </div>
                         </div>
 
-                        {(showUpdate || showDelete) && (
-                            <div className="flex justify-between mt-4">
-                                {showUpdate && (
-                                    <Link
-                                        to={`/pizzas/updatepizza/${pizza._id}`}
-                                        className="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded-md text-sm"
+                        {/* Lower Card Content */}
+                        <div className="p-4 flex flex-col justify-between flex-grow space-y-4">
+                            <p className="text-sm text-gray-600 leading-5 line-clamp-3">{pizza.description}</p>
+
+                            {/* Price + Cart */}
+                            <div className="flex flex-col space-y-2">
+                                {["small", "medium", "large"].map((size) => (
+                                    <div
+                                        key={size}
+                                        className="flex justify-between items-center text-sm"
                                     >
-                                        Update
-                                    </Link>
-                                )}
-                                {showDelete && (
-                                    <button
-                                        onClick={() => handleDelete(pizza._id)}
-                                        className="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded-md text-sm"
-                                    >
-                                        Delete
-                                    </button>
-                                )}
+                                        <span className="text-gray-700 font-medium capitalize">{size}</span>
+                                        <div className="flex items-center gap-2">
+                                            <span className="font-semibold text-gray-800">₹{pizza.prices[size]}</span>
+                                            <button
+                                                onClick={() =>
+                                                    addToCart({
+                                                        isCustom: false,
+                                                        pizzaRef: pizza._id,
+                                                        modelRef: "PizzasModel",
+                                                        name: `${pizza.name} (${size})`,
+                                                        price: pizza.prices[size],
+                                                        quantity: 1,
+                                                        size,
+                                                    })
+                                                }
+                                                className="border border-[var(--color-primary)] text-[var(--color-primary)] hover:bg-[var(--color-primary)] hover:text-white px-3 py-1 rounded-full text-xs transition cursor-pointer"
+                                            >
+                                                Add
+                                            </button>
+                                        </div>
+                                    </div>
+                                ))}
                             </div>
-                        )}
+
+                            {/* Admin Controls */}
+                            {(showUpdate || showDelete) && (
+                                <div className="flex justify-between pt-3 border-t mt-3">
+                                    {showUpdate && (
+                                        <Link
+                                            to={`/pizzas/updatepizza/${pizza._id}`}
+                                            className="text-sm font-medium text-blue-600 hover:underline cursor-pointer"
+                                        >
+                                            Update
+                                        </Link>
+                                    )}
+                                    {showDelete && (
+                                        <button
+                                            onClick={() => handleDelete(pizza._id)}
+                                            className="text-sm font-medium text-red-600 hover:underline cursor-pointer"
+                                        >
+                                            Delete
+                                        </button>
+                                    )}
+                                </div>
+                            )}
+                        </div>
                     </div>
                 ))}
             </div>
-        </>
+
+        </div>
+
     );
 }
