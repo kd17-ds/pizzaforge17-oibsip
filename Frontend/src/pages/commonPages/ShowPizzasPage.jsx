@@ -74,33 +74,55 @@ export default function ShowPizzasPage() {
     };
 
     return (
-        <div className="bg-lite text-sec md:px-20 py-16">
-            <h1 className="text-3xl sm:text-4xl font-bold text-center mb-6 text-[var(--color-primary)]">
-                Explore Our Delicious Pizzas
-            </h1>
-            {/* Filter Buttons */}
-            <div className="flex justify-center gap-4 mb-10">
-                {["All", "Veg", "Non-Veg"].map((type) => (
-                    <button
-                        key={type}
-                        onClick={() => setFilter(type === "All" ? "" : type)}
-                        className={`px-5 py-2 rounded-full text-sm font-semibold border transition-all duration-200 
-          ${filter === type || (filter === "" && type === "All")
-                                ? "bg-[var(--color-primary)] text-white border-[var(--color-primary)]"
-                                : "border-gray-300 hover:bg-[var(--color-lite)]"
-                            }`}
-                    >
-                        {type}
-                    </button>
-                ))}
+        <div className="bg-lite text-sec px-6 md:px-20 py-16">
+            <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-15">
+                {/* Heading Left */}
+                <h1 className="text-4xl md:text-5xl font-extrabold leading-tight">
+                    Explore Delicious  <br /> Flavours at <span className="text-primary">Pizza Forge</span>
+                </h1>
+
+                {/* Filter Buttons Right */}
+                <div className="flex gap-3 md:gap-4 mt-2 md:mt-0">
+                    {["All", "Veg", "Non-Veg"].map((type) => {
+                        const isActive = filter === type || (filter === "" && type === "All");
+                        const baseClasses =
+                            "px-5 py-2 rounded-full text-sm font-semibold transition-all duration-200 shadow-sm hover:shadow-md hover:-translate-y-[1px] cursor-pointer";
+
+                        // Color logic
+                        const colorClasses = (() => {
+                            if (isActive) {
+                                if (type === "Veg") return "bg-green-500 text-white border-green-500";
+                                if (type === "Non-Veg") return "bg-red-500 text-white border-red-500";
+                                return "bg-[var(--color-primary)] text-white border-[var(--color-primary)]";
+                            } else {
+                                if (type === "Veg")
+                                    return "border-green-500 text-green-600 hover:bg-green-100";
+                                if (type === "Non-Veg")
+                                    return "border-red-500 text-red-600 hover:bg-red-100";
+                                return "border-gray-300 text-gray-700 hover:bg-[var(--color-lite)]";
+                            }
+                        })();
+
+                        return (
+                            <button
+                                key={type}
+                                onClick={() => setFilter(type === "All" ? "" : type)}
+                                className={`${baseClasses} ${colorClasses}`}
+                            >
+                                {type}
+                            </button>
+                        );
+                    })}
+                </div>
+
             </div>
 
             {/* Pizza Grid */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-8 px-6 mt-10">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8 mt-10">
                 {pizzas.map((pizza) => (
                     <div
                         key={pizza._id}
-                        className="bg-lite backdrop-blur-sm border border-[var(--color-lite)] rounded-2xl shadow-md hover:shadow-lg transition duration-300 overflow-hidden flex flex-col"
+                        className="bg-primary/20 backdrop-blur-sm  rounded-2xl shadow-lg hover:shadow-lg transition duration-300 overflow-hidden flex flex-col"
                     >
                         {/* Pizza Image + Overlay */}
                         <div className="relative h-36 w-full overflow-hidden">
@@ -128,28 +150,40 @@ export default function ShowPizzasPage() {
                             <p className="text-sm text-gray-600 leading-5 line-clamp-3">{pizza.description}</p>
 
                             {/* Price + Cart */}
-                            <div className="flex flex-col space-y-2">
-                                {["small", "medium", "large"].map((size) => (
+                            <div className="space-y-2 text-sm">
+                                {[
+                                    { label: "Small", slices: "4 slices", key: "small" },
+                                    { label: "Medium", slices: "6 slices", key: "medium" },
+                                    { label: "Large", slices: "8 slices", key: "large" },
+                                ].map(({ label, slices, key }) => (
                                     <div
-                                        key={size}
-                                        className="flex justify-between items-center text-sm"
+                                        key={key}
+                                        className="grid grid-cols-4 items-center gap-2"
                                     >
-                                        <span className="text-gray-700 font-medium capitalize">{size}</span>
-                                        <div className="flex items-center gap-2">
-                                            <span className="font-semibold text-gray-800">₹{pizza.prices[size]}</span>
+                                        {/* Size - left aligned */}
+                                        <div className="text-left text-gray-800 font-medium">{label}</div>
+
+                                        {/* Slices - centered */}
+                                        <div className="text-center text-gray-500 text-xs">{slices}</div>
+
+                                        {/* Price - centered */}
+                                        <div className="text-center text-gray-700 font-semibold">₹{pizza.prices[key]}</div>
+
+                                        {/* Add Button - right aligned */}
+                                        <div className="flex justify-end">
                                             <button
                                                 onClick={() =>
                                                     addToCart({
                                                         isCustom: false,
                                                         pizzaRef: pizza._id,
                                                         modelRef: "PizzasModel",
-                                                        name: `${pizza.name} (${size})`,
-                                                        price: pizza.prices[size],
+                                                        name: `${pizza.name} (${key})`,
+                                                        price: pizza.prices[key],
                                                         quantity: 1,
-                                                        size,
+                                                        size: key,
                                                     })
                                                 }
-                                                className="border border-[var(--color-primary)] text-[var(--color-primary)] hover:bg-[var(--color-primary)] hover:text-white px-3 py-1 rounded-full text-xs transition cursor-pointer"
+                                                className="text-xs text-[var(--color-primary)] hover:bg-[var(--color-primary)] hover:text-white border border-[var(--color-primary)] px-3 py-[2px] rounded-full transition cursor-pointer w-fit"
                                             >
                                                 Add
                                             </button>
@@ -158,13 +192,14 @@ export default function ShowPizzasPage() {
                                 ))}
                             </div>
 
+
                             {/* Admin Controls */}
                             {(showUpdate || showDelete) && (
                                 <div className="flex justify-between pt-3 border-t mt-3">
                                     {showUpdate && (
                                         <Link
                                             to={`/pizzas/updatepizza/${pizza._id}`}
-                                            className="text-sm font-medium text-blue-600 hover:underline cursor-pointer"
+                                            className="text-sm font-medium text-[var(--color-primary)] hover:underline underline-offset-4 cursor-pointer"
                                         >
                                             Update
                                         </Link>
@@ -172,13 +207,14 @@ export default function ShowPizzasPage() {
                                     {showDelete && (
                                         <button
                                             onClick={() => handleDelete(pizza._id)}
-                                            className="text-sm font-medium text-red-600 hover:underline cursor-pointer"
+                                            className="text-sm font-medium text-rose-600 underline-offset-4 hover:underline cursor-pointer"
                                         >
                                             Delete
                                         </button>
                                     )}
                                 </div>
                             )}
+
                         </div>
                     </div>
                 ))}
