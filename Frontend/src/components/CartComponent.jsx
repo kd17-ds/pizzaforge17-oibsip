@@ -121,97 +121,191 @@ export default function CartPanel() {
         }
     };
 
-    return (
-        <div className={`fixed top-0 right-0 h-full w-80 bg-white shadow-lg p-4 z-50 transform transition-transform duration-300 overflow-y-auto ${isOpen ? "translate-x-0" : "translate-x-full"}`}>
+    const isShippingAddressValid = () => {
+        const { fullName, phone, pincode, city, state, street } = shippingAddress;
+        return (
+            fullName.trim() &&
+            phone.trim() &&
+            pincode.trim() &&
+            city.trim() &&
+            state.trim() &&
+            street.trim()
+        );
+    };
 
+
+    return (
+        <div
+            className={`fixed top-0 right-0 h-full w-full sm:w-[90vw] md:w-[25rem] bg-cart shadow-lg px-4 md:px-6 py-4 z-50 transform transition-transform duration-300 overflow-y-auto ${isOpen ? "translate-x-0" : "translate-x-full"
+                }`}
+        >
+
+            {/* Header */}
             <div className="flex justify-between items-center mb-4">
-                <h2 className="text-xl font-bold">Cart</h2>
-                <button onClick={() => setIsOpen(false)}>✕</button>
+                <h2 className="text-3xl font-bold text-sec">Your Cart</h2>
+                <button
+                    onClick={() => setIsOpen(false)}
+                    className="text-xl text-sec font-bold hover:cursor-pointer"
+                >
+                    ✕
+                </button>
             </div>
 
             {cartItems.length === 0 ? (
-                <div className="text-center text-gray-600">
-                    <p>No items in cart.</p>
-                    <div className="mt-4 space-y-2">
-                        <a href="/showallpizzas" className="inline-block bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">
-                            Order Regular Pizzas
+                <div className="flex flex-col items-center justify-center text-center text-gray-600 py-10 px-4">
+                    <p className="text-lg md:text-xl font-medium text-gray-700 mb-6">
+                        No items in cart.
+                    </p>
+
+                    <div className="space-y-3 w-full max-w-xs">
+                        <a
+                            href="/showallpizzas"
+                            className="block w-full bg-sec text-white text-sm md:text-base px-5 py-2.5 rounded-lg shadow-md hover:opacity-90 transition"
+                        >
+                            🍕 Order Regular Pizzas
                         </a>
-                        <br />
-                        <a href="/allcustomizedpizza" className="inline-block bg-purple-500 text-white px-4 py-2 rounded hover:bg-purple-600">
-                            Order Customized Pizzas
+
+                        <a
+                            href="/allcustomizedpizza"
+                            className="block w-full bg-sec text-white text-sm md:text-base px-5 py-2.5 rounded-lg shadow-md hover:opacity-90 transition"
+                        >
+                            🎨 Order Customized Pizzas
                         </a>
                     </div>
                 </div>
+
             ) : (
                 <>
-                    <ul className="space-y-2 overflow-y-auto max-h-[50vh]">
+                    {/* Cart Items Table Format */}
+                    <div
+                        className="max-h-[45vh] overflow-y-auto pr-4 py-3 mb-3"
+                        style={{
+                            scrollbarWidth: "none",            // Firefox
+                            msOverflowStyle: "none",           // IE/Edge
+                        }}
+                    >
+                        {/* Header Row */}
+                        <div className="grid grid-cols-[1fr_auto_auto_auto] text-sm font-semibold text-primary  py-2">
+                            <div className="text-left">Item</div>
+                            <div className="text-center w-[60px]">Qty</div>
+                            <div className="text-center w-[80px]">Price</div>
+                            <div className="text-right w-[70px]">Remove</div>
+                        </div>
+
+                        {/* Items */}
                         {cartItems.map((item, idx) => (
-                            <li key={idx} className="border p-2 rounded">
-                                <p className="font-semibold">{item.name}</p>
-                                <p>Qty: {item.quantity}</p>
-                                <p>Price: ₹{item.price}</p>
-                                <button onClick={() => removeFromCart(item)} className="text-red-500 text-sm mt-1">
-                                    Remove
-                                </button>
-                            </li>
+                            <div
+                                key={idx}
+                                className="grid grid-cols-[1fr_auto_auto_auto] items-center text-sm  py-2  rounded transition"
+                            >
+                                {/* Name + Size */}
+                                <div className="text-left">
+                                    <div className="font-medium text-[var(--color-secondary)] leading-snug line-clamp-2">
+                                        {item.name}
+                                    </div>
+                                    <div className="text-xs text-gray-500 mt-1">
+                                        {item.size.charAt(0).toUpperCase() + item.size.slice(1)}
+                                    </div>
+                                </div>
+
+                                {/* Quantity */}
+                                <div className="text-center w-[60px]">{item.quantity}</div>
+
+                                {/* Price */}
+                                <div className="text-center w-[80px]">₹{item.price}</div>
+
+                                {/* Remove Button */}
+                                <div className="text-right w-[70px]">
+                                    <button
+                                        onClick={() => removeFromCart(item)}
+                                        className="text-red-600 text-xs hover:underline hover:cursor-pointer underline-offset-4"
+                                    >
+                                        Remove
+                                    </button>
+                                </div>
+                            </div>
                         ))}
-                    </ul>
+                        <style>
+                            {`
+      div::-webkit-scrollbar {
+        display: none; /* Chrome, Safari */
+      }
+    `}
+                        </style>
+                    </div>
 
-                    <form className="mt-4 space-y-2">
-                        <p className="font-semibold">Total: ₹{calculateTotal(cartItems)}</p>
+                    {/* Clear Cart & Total in One Row */}
+                    <div className="flex justify-between mb-3 gap-4">
+                        {/* Clear Cart Button */}
+                        <div className="w-1/2 flex justify-start">
+                            <button
+                                onClick={clearCart}
+                                className="text-red-600 text-lg hover:underline hover:cursor-pointer underline-offset-4"
+                            >
+                                Clear Cart
+                            </button>
+                        </div>
 
-                        <h3 className="font-semibold">Shipping Address</h3>
-                        <input type="text" placeholder="Full Name" required className="w-full border px-2 py-1 rounded"
-                            value={shippingAddress.fullName}
-                            onChange={(e) => setShippingAddress({ ...shippingAddress, fullName: e.target.value })}
-                        />
-                        <input type="tel" placeholder="Phone" required className="w-full border px-2 py-1 rounded"
-                            value={shippingAddress.phone}
-                            onChange={(e) => setShippingAddress({ ...shippingAddress, phone: e.target.value })}
-                        />
-                        <input type="text" placeholder="Street" required className="w-full border px-2 py-1 rounded"
-                            value={shippingAddress.street}
-                            onChange={(e) => setShippingAddress({ ...shippingAddress, street: e.target.value })}
-                        />
-                        <input type="text" placeholder="Landmark (optional)" className="w-full border px-2 py-1 rounded"
-                            value={shippingAddress.landmark}
-                            onChange={(e) => setShippingAddress({ ...shippingAddress, landmark: e.target.value })}
-                        />
-                        <input type="text" placeholder="City" required className="w-full border px-2 py-1 rounded"
-                            value={shippingAddress.city}
-                            onChange={(e) => setShippingAddress({ ...shippingAddress, city: e.target.value })}
-                        />
-                        <input type="text" placeholder="State" required className="w-full border px-2 py-1 rounded"
-                            value={shippingAddress.state}
-                            onChange={(e) => setShippingAddress({ ...shippingAddress, state: e.target.value })}
-                        />
-                        <input type="text" placeholder="Pincode" required className="w-full border px-2 py-1 rounded"
-                            value={shippingAddress.pincode}
-                            onChange={(e) => setShippingAddress({ ...shippingAddress, pincode: e.target.value })}
-                        />
+                        {/* Total */}
+                        <div className="w-1/2 flex justify-end">
+                            <p className="font-semibold text-sec text-base">
+                                Total: ₹{calculateTotal(cartItems)}
+                            </p>
+                        </div>
+                    </div>
 
+
+                    {/* Shipping Form */}
+                    <h3 className="font-semibold text-[var(--color-primary)] mt-4">Shipping Address</h3>
+
+                    <form className="mt-2 space-y-2">
+                        {[
+                            ["Full Name", "fullName"],
+                            ["Phone", "phone"],
+                            ["Street", "street"],
+                            ["Landmark (optional)", "landmark"],
+                            ["City", "city"],
+                            ["State", "state"],
+                            ["Pincode", "pincode"],
+                        ].map(([placeholder, key]) => (
+                            <input
+                                key={key}
+                                type={key === "phone" || key === "pincode" ? "tel" : "text"}
+                                placeholder={placeholder}
+                                required={key !== "landmark"}
+                                className="w-full bg-[var(--color-lite)] border px-3 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)] text-sm"
+                                value={shippingAddress[key]}
+                                onChange={(e) =>
+                                    setShippingAddress({ ...shippingAddress, [key]: e.target.value })
+                                }
+                            />
+                        ))}
+
+                        {/* Payment Buttons */}
                         <button
                             type="button"
                             onClick={placeOrderWithRazorpay}
-                            className="w-full mt-2 bg-green-600 text-white px-4 py-2 rounded hover:cursor-pointer hover:bg-green-700"
+                            disabled={!isShippingAddressValid()}
+                            className={`w-full mt-2 px-4 py-2 rounded hover:cursor-pointer transition ${isShippingAddressValid()
+                                ? "bg-sec text-white hover:opacity-90"
+                                : "bg-sec text-white cursor-not-allowed"
+                                }`}
                         >
                             Pay with Razorpay
                         </button>
 
+
                         <button
                             type="button"
                             onClick={placeOrderWithCOD}
-                            className="w-full mt-2 bg-gray-700 text-white px-4 py-2 rounded hover:cursor-pointer hover:bg-gray-800"
+                            className="w-full mt-2 bg-sec text-white px-4 py-2 rounded hover:opacity-90 hover:cursor-pointer"
                         >
                             Cash on Delivery
-                        </button>
-
-                        <button type="button" onClick={clearCart} className="w-full mt-2 text-red-600 text-sm hover:underline">
-                            Clear Cart
                         </button>
                     </form>
                 </>
             )}
         </div>
+
     );
 }

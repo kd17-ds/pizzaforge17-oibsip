@@ -148,7 +148,12 @@ function App() {
                 </Route>
             </Routes>
 
-            {shouldShowCart && <CartPanel />}
+            {shouldShowCart && (
+                <UserProtectedRoute>
+                    <CartPanel />
+                </UserProtectedRoute>
+            )}
+
         </>
     );
 }
