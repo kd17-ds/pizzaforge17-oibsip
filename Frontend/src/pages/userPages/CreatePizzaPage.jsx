@@ -96,89 +96,105 @@ export default function CreatePizzaPage() {
     };
 
     return (
-        <div className="p-6 bg-gray-100 min-h-screen">
-            <h1 className="text-3xl font-bold mb-6 text-center text-indigo-700">
-                🍕 Create Your Custom Pizza
-            </h1>
+        <div className="bg-lite min-h-screen py-10 px-4 md:px-10">
+            <div className="max-w-3xl mx-auto bg-white rounded-3xl shadow-xl border border-sec p-8 space-y-10">
+                <h1 className="text-3xl font-bold text-center text-primary"> Build Your Pizza</h1>
 
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                {/* Ingredient Selection */}
-                <div className="lg:col-span-2 space-y-6">
-                    {["base", "cheese", "sauce", "veggie"].map(
-                        (type) =>
-                            inventory[type]?.length > 0 && (
-                                <div key={type}>
-                                    <h2 className="text-xl font-semibold text-indigo-600 mb-2">
-                                        {typeLabels[type]}
-                                    </h2>
-                                    <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-                                        {inventory[type].map((item) => {
-                                            const isSelected =
-                                                type === "veggie"
-                                                    ? selectedVeggies.find((v) => v._id === item._id)
-                                                    : (type === "base" &&
-                                                        selectedBase?._id === item._id) ||
-                                                    (type === "cheese" &&
-                                                        selectedCheese?._id === item._id) ||
-                                                    (type === "sauce" &&
-                                                        selectedSauce?._id === item._id);
+                {/* Base Selection */}
+                <section>
+                    <h2 className="text-xl font-semibold text-sec mb-3">1. Choose a Base</h2>
+                    <div className="flex flex-wrap gap-3">
+                        {inventory.base?.map((item) => (
+                            <button
+                                key={item._id}
+                                onClick={() => item.isAvailable && setSelectedBase(item)}
+                                disabled={!item.isAvailable}
+                                className={`border px-4 py-2 rounded-lg text-sm transition 
+                            ${selectedBase?._id === item._id ? "bg-sec text-white border-sec" : "border-gray-300 bg-lite"}
+                            ${item.isAvailable
+                                        ? "hover:bg-primary hover:text-white cursor-pointer"
+                                        : "opacity-50 cursor-not-allowed"}
+                        `}
+                            >
+                                {item.name} – ₹{item.price}
+                            </button>
+                        ))}
+                    </div>
+                </section>
 
-                                            const toggleSelect = () => {
-                                                if (type === "veggie") handleVeggieToggle(item);
-                                                else if (type === "base") setSelectedBase(item);
-                                                else if (type === "cheese") setSelectedCheese(item);
-                                                else if (type === "sauce") setSelectedSauce(item);
-                                            };
+                {/* Cheese Selection */}
+                <section>
+                    <h2 className="text-xl font-semibold text-sec mb-3">2. Select Cheese</h2>
+                    <div className="flex flex-wrap gap-3">
+                        {inventory.cheese?.map((item) => (
+                            <button
+                                key={item._id}
+                                onClick={() => item.isAvailable && setSelectedCheese(item)}
+                                disabled={!item.isAvailable}
+                                className={`border px-4 py-2 rounded-lg text-sm transition 
+                            ${selectedCheese?._id === item._id ? "bg-sec text-white border-sec" : "border-gray-300 bg-lite"}
+                            ${item.isAvailable
+                                        ? "hover:bg-primary hover:text-white cursor-pointer"
+                                        : "opacity-50 cursor-not-allowed"}
+                        `}
+                            >
+                                {item.name} – ₹{item.price}
+                            </button>
+                        ))}
+                    </div>
+                </section>
 
-                                            return (
-                                                <div
-                                                    key={item._id}
-                                                    className={`
-                                                               border rounded-xl p-3 bg-white shadow-md transition 
-                                                              ${isSelected
-                                                            ? "border-indigo-500 ring-2 ring-indigo-300"
-                                                            : "border-gray-300"
-                                                        }
-                                                       ${item.isAvailable
-                                                            ? "cursor-pointer hover:shadow-lg"
-                                                            : "opacity-50 cursor-not-allowed"
-                                                        }
-                                                      `}
-                                                    onClick={() => {
-                                                        if (!item.isAvailable) return;
-                                                        toggleSelect();
-                                                    }}
-                                                >
-                                                    <div className="font-medium text-gray-800">
-                                                        {item.name}
-                                                    </div>
-                                                    <div className="text-sm text-gray-600">
-                                                        ₹{item.price}
-                                                    </div>
-                                                    <div
-                                                        className={`text-xs font-medium ${item.isAvailable
-                                                            ? "text-green-600"
-                                                            : "text-red-500"
-                                                            }`}
-                                                    >
-                                                        {item.isAvailable ? "Available" : "Unavailable"}
-                                                    </div>
-                                                </div>
-                                            );
-                                        })}
-                                    </div>
-                                </div>
-                            )
-                    )}
-                </div>
+                {/* Sauce Selection */}
+                <section>
+                    <h2 className="text-xl font-semibold text-sec mb-3">3. Pick Your Sauce</h2>
+                    <div className="flex flex-wrap gap-3">
+                        {inventory.sauce?.map((item) => (
+                            <button
+                                key={item._id}
+                                onClick={() => item.isAvailable && setSelectedSauce(item)}
+                                disabled={!item.isAvailable}
+                                className={`border px-4 py-2 rounded-lg text-sm transition 
+                            ${selectedSauce?._id === item._id ? "bg-sec text-white border-sec" : "border-gray-300 bg-lite"}
+                            ${item.isAvailable
+                                        ? "hover:bg-primary hover:text-white cursor-pointer"
+                                        : "opacity-50 cursor-not-allowed"}
+                        `}
+                            >
+                                {item.name} – ₹{item.price}
+                            </button>
+                        ))}
+                    </div>
+                </section>
 
-                {/* Summary Section */}
-                <div className="bg-white rounded-xl shadow-md p-6 border border-gray-200 sticky top-10 h-fit">
-                    <h3 className="text-xl font-bold text-indigo-600 mb-4">
-                        📋 Your Selection
-                    </h3>
+                {/* Veggie Selection */}
+                <section>
+                    <h2 className="text-xl font-semibold text-sec mb-3">4. Add Veggies</h2>
+                    <div className="flex flex-wrap gap-3">
+                        {inventory.veggie?.map((item) => {
+                            const isSelected = selectedVeggies.some((v) => v._id === item._id);
+                            return (
+                                <button
+                                    key={item._id}
+                                    onClick={() => item.isAvailable && handleVeggieToggle(item)}
+                                    disabled={!item.isAvailable}
+                                    className={`border px-4 py-2 rounded-lg text-sm transition 
+                                ${isSelected ? "bg-sec text-white border-sec" : "border-gray-300 bg-lite"}
+                                ${item.isAvailable
+                                            ? "hover:bg-primary hover:text-white cursor-pointer"
+                                            : "opacity-50 cursor-not-allowed"}
+                            `}
+                                >
+                                    {item.name} – ₹{item.price}
+                                </button>
+                            );
+                        })}
+                    </div>
+                </section>
 
-                    <div className="space-y-2 text-sm text-gray-700">
+                {/* Summary */}
+                <section className="bg-lite border border-sec p-5 rounded-2xl">
+                    <h3 className="text-lg font-bold text-sec mb-4">📋 Order Summary</h3>
+                    <div className="text-sm text-gray-800 space-y-1">
                         {selectedBase && (
                             <div className="flex justify-between">
                                 <span>Base: {selectedBase.name}</span>
@@ -197,23 +213,14 @@ export default function CreatePizzaPage() {
                                 <span>₹{selectedSauce.price}</span>
                             </div>
                         )}
-                        {selectedVeggies.length > 0 && (
-                            <div>
-                                <div className="font-semibold mb-1">Veggies:</div>
-                                {selectedVeggies.map((veg) => (
-                                    <div key={veg._id} className="flex justify-between ml-2">
-                                        <span>🥬 {veg.name}</span>
-                                        <span>₹{veg.price}</span>
-                                    </div>
-                                ))}
+                        {selectedVeggies.map((veg) => (
+                            <div key={veg._id} className="flex justify-between">
+                                <span>🥬 {veg.name}</span>
+                                <span>₹{veg.price}</span>
                             </div>
-                        )}
-                    </div>
-
-                    <hr className="my-4" />
-
-                    <div className="text-sm text-gray-800 space-y-1">
-                        <div className="flex justify-between">
+                        ))}
+                        <hr className="my-3 border-sec" />
+                        <div className="flex justify-between font-medium">
                             <span>Subtotal:</span>
                             <span>₹{subtotal.toFixed(2)}</span>
                         </div>
@@ -221,21 +228,25 @@ export default function CreatePizzaPage() {
                             <span>GST (5%):</span>
                             <span>₹{gst.toFixed(2)}</span>
                         </div>
-                        <div className="flex justify-between font-bold text-indigo-700">
+                        <div className="flex justify-between font-bold text-primary text-base">
                             <span>Total:</span>
                             <span>₹{total.toFixed(2)}</span>
                         </div>
                     </div>
+                </section>
 
+                {/* Submit Button */}
+                <div className="pt-2">
                     <button
-                        className="w-full mt-6 bg-indigo-600 hover:bg-indigo-700 text-white py-2 px-4 rounded-lg transition"
                         onClick={handleCreatePizza}
                         disabled={!selectedBase || !selectedCheese || !selectedSauce}
+                        className="w-full mt-4 bg-sec hover:cursor-pointer hover:bg-primary text-white font-semibold py-3 rounded-xl text-lg transition disabled:opacity-50 disabled:cursor-not-allowed"
                     >
-                        🍕 Create Pizza
+                        Create Pizza
                     </button>
                 </div>
             </div>
         </div>
+
     );
 }
