@@ -73,103 +73,129 @@ export default function AddPizzasPage() {
     }
 
     return (
-        <div className="min-h-screen bg-gray-100 flex items-center justify-center px-4 py-10">
-            <div className="w-full max-w-xl bg-white rounded-xl shadow-md p-6">
-                <h2 className="text-2xl font-bold text-center mb-6 text-sec">Add New Pizza</h2>
+        <div className="min-h-[calc(100vh-225px)] pt-[50px] flex items-center  justify-center px-4 ">
+            <div className="w-full max-w-3xl bg-primary/25 rounded-3xl shadow-xl overflow-hidden border-sec border-2">
+                {/* Header */}
+                <div className=" text-sec text-center py-6 px-4 border-b-2">
+                    <h2 className="text-2xl md:text-3xl font-semibold">Add a New Pizza</h2>
+                </div>
 
+                {/* Form */}
+                <form onSubmit={handleSubmit} className="p-6 md:p-8 space-y-6 ">
 
-
-                <form onSubmit={handleSubmit} className="space-y-4">
-                    <input
-                        type="text"
-                        name="name"
-                        placeholder="Pizza Name"
-                        value={formData.name}
-                        onChange={handleChange}
-                        className="w-full border border-gray-300 rounded-lg px-4 py-2"
-                        required
-                    />
-
-                    <textarea
-                        name="description"
-                        placeholder="Description"
-                        value={formData.description}
-                        onChange={handleChange}
-                        className="w-full border border-gray-300 rounded-lg px-4 py-2 resize-none"
-                        rows={3}
-                        required
-                    />
-
-                    <select
-                        name="category"
-                        value={formData.category}
-                        onChange={handleChange}
-                        className="w-full border border-gray-300 rounded-lg px-4 py-2"
-                        required
-                    >
-                        <option value="Veg">Veg</option>
-                        <option value="Non-Veg">Non-Veg</option>
-                    </select>
-
-                    <input
-                        type="text"
-                        name="image_url"
-                        placeholder="Image URL"
-                        value={formData.image_url}
-                        onChange={handleChange}
-                        className="w-full border border-gray-300 rounded-lg px-4 py-2"
-                        required
-                    />
-
-                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                    {/* Pizza Name */}
+                    <div>
+                        <label className="text-sm font-medium text-gray-700">Pizza Name</label>
                         <input
-                            type="number"
-                            name="small"
-                            placeholder="Price (Small)"
-                            value={formData.prices.small}
+                            type="text"
+                            name="name"
+                            placeholder="e.g. Spicy Veggie Overload"
+                            value={formData.name}
                             onChange={handleChange}
-                            className="w-full border border-gray-300 rounded-lg px-4 py-2"
-                            required
-                        />
-                        <input
-                            type="number"
-                            name="medium"
-                            placeholder="Price (Medium)"
-                            value={formData.prices.medium}
-                            onChange={handleChange}
-                            className="w-full border border-gray-300 rounded-lg px-4 py-2"
-                            required
-                        />
-                        <input
-                            type="number"
-                            name="large"
-                            placeholder="Price (Large)"
-                            value={formData.prices.large}
-                            onChange={handleChange}
-                            className="w-full border border-gray-300 rounded-lg px-4 py-2"
+                            className="mt-1 w-full border border-sec rounded-lg px-4 py-2 text-gray-800 focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]"
                             required
                         />
                     </div>
 
-                    <div className="flex items-center space-x-2">
+                    {/* Description */}
+                    <div>
+                        <label className="text-sm font-medium text-gray-700">Description</label>
+                        <textarea
+                            name="description"
+                            placeholder="Short description of the pizza"
+                            value={formData.description}
+                            onChange={handleChange}
+                            className="mt-1 w-full border border-sec rounded-lg px-4 py-2 resize-none text-gray-800 focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]"
+                            rows={3}
+                            required
+                        />
+                    </div>
+
+                    {/* Category + Image URL */}
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label className="text-sm font-medium text-gray-700">Category</label>
+                            <select
+                                name="category"
+                                value={formData.category}
+                                onChange={handleChange}
+                                className="mt-1 w-full border border-sec rounded-lg px-4 py-2 text-gray-800 focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]"
+                                required
+                            >
+                                <option value="Veg">Veg</option>
+                                <option value="Non-Veg">Non-Veg</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label className="text-sm font-medium text-gray-700">Image URL</label>
+                            <input
+                                type="text"
+                                name="image_url"
+                                placeholder="https://example.com/pizza.jpg"
+                                value={formData.image_url}
+                                onChange={handleChange}
+                                className="mt-1 w-full border border-sec rounded-lg px-4 py-2 text-gray-800 focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]"
+                                required
+                            />
+                        </div>
+                    </div>
+
+                    {/* Price Grid */}
+                    <div>
+                        <label className="text-sm font-medium text-gray-700 mb-2 block">Prices</label>
+                        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                            <input
+                                type="number"
+                                name="small"
+                                placeholder="Small"
+                                value={formData.prices.small}
+                                onChange={handleChange}
+                                className="w-full border border-sec rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]"
+                                required
+                            />
+                            <input
+                                type="number"
+                                name="medium"
+                                placeholder="Medium"
+                                value={formData.prices.medium}
+                                onChange={handleChange}
+                                className="w-full border border-sec rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]"
+                                required
+                            />
+                            <input
+                                type="number"
+                                name="large"
+                                placeholder="Large"
+                                value={formData.prices.large}
+                                onChange={handleChange}
+                                className="w-full border border-sec rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]"
+                                required
+                            />
+                        </div>
+                    </div>
+
+                    {/* Availability */}
+                    <div className="flex items-center gap-2">
                         <input
                             type="checkbox"
                             name="availability"
                             checked={formData.availability}
                             onChange={handleChange}
-                            className="accent-sec"
+                            className="accent-[var(--color-secondary)] h-5 w-5"
                         />
-                        <label className="text-sm">Available</label>
+                        <label className="text-sm text-gray-700">Available for order</label>
                     </div>
 
+                    {/* Submit Button */}
                     <button
                         type="submit"
-                        className="w-full bg-sec text-white py-2 rounded-lg hover:bg-lite transition"
+                        className="w-full hover:cursor-pointer hover:bg-[var(--color-primary)] text-white text-lg font-medium py-3 rounded-xl bg-sec transition"
                     >
                         Add Pizza
                     </button>
                 </form>
             </div>
         </div>
+
     );
 };
