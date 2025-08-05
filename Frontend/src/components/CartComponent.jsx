@@ -133,6 +133,10 @@ export default function CartPanel() {
         );
     };
 
+    const formatSize = (size) => {
+        return size ? size.charAt(0).toUpperCase() + size.slice(1) : "Custom";
+    };
+
 
     return (
         <div
@@ -204,7 +208,7 @@ export default function CartPanel() {
                                         {item.name}
                                     </div>
                                     <div className="text-xs text-gray-500 mt-1">
-                                        {item.size.charAt(0).toUpperCase() + item.size.slice(1)}
+                                        {formatSize(item.size)}
                                     </div>
                                 </div>
 

@@ -98,7 +98,7 @@ export default function CreatePizzaPage() {
     return (
         <div className="bg-lite min-h-screen py-10 px-4 md:px-10">
             <div className="max-w-3xl mx-auto bg-white rounded-3xl shadow-xl border border-sec p-8 space-y-10">
-                <h1 className="text-3xl font-bold text-center text-primary"> Build Your Pizza</h1>
+                <h1 className="text-3xl font-bold text-center text-sec"> Build Your Pizza</h1>
 
                 {/* Base Selection */}
                 <section>
