@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { FaPizzaSlice, FaPlusCircle, FaBoxes } from "react-icons/fa";
+import { FaPizzaSlice, FaClipboardList, FaBoxes } from "react-icons/fa";
 
 export default function AdminHomePage() {
     return (
@@ -49,14 +49,14 @@ export default function AdminHomePage() {
                     </Link>
 
                     <Link
-                        to="/admin/inventory/addingridient"
+                        to="/admin/allorders"
                         className="group bg-lite text-sec border border-sec/60 rounded-xl p-5 flex items-center justify-between hover:brightness-95 transition-all shadow-sm"
                     >
                         <div>
-                            <h2 className="text-lg font-semibold">Add Ingredient</h2>
-                            <p className="text-base leading-7">Insert raw ingredients into inventory.</p>
+                            <h2 className="text-lg font-semibold">Order Overview</h2>
+                            <p className="text-base leading-7"> Manage every customer order from one place.</p>
                         </div>
-                        <FaPlusCircle className="text-3xl ml-4 opacity-70 group-hover:scale-110 transition" />
+                        <FaClipboardList className="text-3xl ml-4 opacity-70 group-hover:scale-110 transition" />
                     </Link>
 
                     <Link

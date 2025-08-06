@@ -5,9 +5,9 @@ import { BASE_URL } from "../../constants/constants";
 import { useLoader } from "../../contexts/LoadingContext";
 import { useNotification } from "../../contexts/NotificationContext";
 import httpStatus from "http-status";
+import { FaBoxes, FaPlusCircle, FaEdit, FaTrashAlt } from "react-icons/fa";
 
 export default function InventoryManagementPage() {
-
     const [inventory, setInventory] = useState({});
     const { showNotification } = useNotification();
     const { showLoader, hideLoader } = useLoader();
@@ -23,22 +23,17 @@ export default function InventoryManagementPage() {
                 showLoader();
                 const res = await client.get("/customized-pizzas/allingridients");
                 if (res.status === httpStatus.OK) {
-                    console.log(res.data);
-
                     setInventory(res.data);
-                    console.log(inventory.base[3].price)
-
-
                 }
             } catch (err) {
-                showNotification("Error Fetching", "error");
+                showNotification(err, "error");
             } finally {
                 hideLoader();
             }
-        }
+        };
 
         fetchInventory();
-    }, [])
+    }, []);
 
     const handleDelete = async (id, type) => {
         const confirm = window.confirm("Are you sure you want to delete this Ingridient?");
@@ -59,6 +54,7 @@ export default function InventoryManagementPage() {
             hideLoader();
         }
     };
+
     const formatDate = (dateStr) => new Date(dateStr).toLocaleDateString();
 
     const typeLabels = {
@@ -68,64 +64,147 @@ export default function InventoryManagementPage() {
         veggie: "Veggies"
     };
 
-    return (
-        <div className="p-6 bg-gray-100 min-h-screen">
-            <h1 className="text-2xl font-bold mb-6 text-center">🍕 Inventory Management</h1>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {["base", "cheese", "sauce", "veggie"].map((type) => (
-                    inventory[type]?.length > 0 && (
-                        <div key={type} className="bg-white shadow-md rounded-xl p-4 border border-gray-200">
-                            <h2 className="text-xl font-semibold mb-4 text-indigo-600">{typeLabels[type]}</h2>
-                            <div className="space-y-3 max-h-[400px] overflow-y-auto pr-1">
-                                {inventory[type].map((ingredient) => (
-                                    <div key={ingredient._id} className="border p-3 rounded-lg flex flex-col gap-1 bg-gray-50">
-                                        <div className="flex justify-between">
-                                            <span className="font-medium text-gray-800">{ingredient.name}</span>
-                                            <span className="text-sm text-gray-500">{formatDate(ingredient.createdAt)}</span>
-                                        </div>
-                                        <div className="flex justify-between text-sm">
-                                            <span>💰 Price: ₹{ingredient.price}</span>
-                                            <span>📦 Qty: {ingredient.availableQty}</span>
-                                        </div>
-                                        <div className="flex justify-between text-sm">
-                                            <span>Status: {ingredient.isAvailable ? (
-                                                <span className="text-green-600 font-semibold">In Stock</span>
-                                            ) : (
-                                                <span className="text-red-600 font-semibold">Out of Stock</span>
-                                            )}</span>
-
-                                            <div className="flex gap-2">
-                                                <Link
-                                                    to={`updateingridient/${ingredient._id}?type=${type}`}
-                                                    className="text-blue-600 hover:underline text-sm font-semibold"
-                                                >
-                                                    ✏️ Update
-                                                </Link>
-                                                <button
-                                                    onClick={() => handleDelete(ingredient._id, type)}
-                                                    className="text-red-600 hover:underline text-sm font-semibold"
-                                                >
-                                                    🗑 Delete
-                                                </button>
-                                            </div>
-                                        </div>
-                                    </div>
-                                ))}
-                            </div>
-                            <Link
-                                to={`addingridient?type=${type}`}
-                                className="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded-md text-sm"
-                            >
-                                Add {typeLabels[type]}
-                            </Link>
-                        </div>
-                    )
-                ))}
+    const renderTable = (type) => (
+        <div key={type} className="mb-10 rounded-xl border border-sec/40 p-4 shadow-sm text-sec">
+            {/* Header */}
+            <div className="flex items-center justify-between mb-4">
+                <h2 className="text-xl font-semibold tracking-wide uppercase pl-3">
+                    {typeLabels[type]}
+                </h2>
+                <Link
+                    to={`addingridient?type=${type}`}
+                    className="text-sec text-base underline-offset-8 flex items-center gap-1 hover:underline pr-3"
+                >
+                    <FaPlusCircle />
+                    Add
+                </Link>
             </div>
 
+            {/* Table */}
+            {/* Table wrapper */}
+            <div className="w-full">
+                {/* Desktop table */}
+                <table className="hidden sm:table w-full text-sm border-separate border-spacing-y-2 table-fixed">
+                    <thead>
+                        <tr className="text-sec/60 text-center">
+                            <th className="w-[18%] text-left pl-3">Name</th>
+                            <th className="w-[12%]">₹</th>
+                            <th className="w-[12%]">Qty</th>
+                            <th className="w-[18%]">Status</th>
+                            <th className="w-[20%]">Added</th>
+                            <th className="w-[10%] pr-3 text-right">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {inventory[type].map((ingredient) => (
+                            <tr
+                                key={ingredient._id}
+                                className="hover:bg-lite/5 border border-lite/10 rounded-xl text-center"
+                            >
+                                <td className="pl-3 py-2 rounded-l-xl w-[18%] truncate text-left">{ingredient.name}</td>
+                                <td className="w-[12%]">₹{ingredient.price}</td>
+                                <td className="w-[12%]">{ingredient.availableQty}</td>
+                                <td className="w-[18%]">
+                                    <span className={`font-medium ${ingredient.isAvailable ? "text-green-400" : "text-red-400"}`}>
+                                        {ingredient.isAvailable ? "In Stock" : "Out of Stock"}
+                                    </span>
+                                </td>
+                                <td className="w-[20%]">{formatDate(ingredient.createdAt)}</td>
+                                <td className="w-[20%] text-right pr-3 rounded-r-xl space-x-3">
+                                    <Link
+                                        to={`updateingridient/${ingredient._id}?type=${type}`}
+                                        className="text-sec hover:cursor-pointer hover:scale-110 transition inline-block"
+                                    >
+                                        <FaEdit />
+                                    </Link>
+                                    <button
+                                        onClick={() => handleDelete(ingredient._id, type)}
+                                        className="text-red-400 hover:cursor-pointer hover:scale-110 transition inline-block"
+                                    >
+                                        <FaTrashAlt />
+                                    </button>
+                                </td>
+                            </tr>
+                        ))}
+                    </tbody>
+                </table>
+
+
+                {/* Mobile card layout */}
+                <div className="space-y-4 sm:hidden">
+                    {inventory[type].map((ingredient) => (
+                        <div
+                            key={ingredient._id}
+                            className="border border-sec/30 rounded-xl px-4 py-3 bg-lite/5 text-sec shadow-sm space-y-3"
+                        >
+                            {/* Top: Name + Status */}
+                            <div className="flex items-center justify-between">
+                                <h3 className="text-base font-semibold capitalize truncate w-2/3">{ingredient.name}</h3>
+                                <span className={`text-sm font-medium ${ingredient.isAvailable ? "text-green-500" : "text-red-400"}`}>
+                                    {ingredient.isAvailable ? "In Stock" : "Out of Stock"}
+                                </span>
+                            </div>
+
+                            {/* Info + Buttons in same row */}
+                            <div className="flex justify-between items-center text-sm">
+                                <div>
+                                    <p className="text-xs text-sec/60">Price</p>
+                                    <p className="font-medium">₹{ingredient.price}</p>
+                                </div>
+                                <div>
+                                    <p className="text-xs text-sec/60">Qty</p>
+                                    <p className="font-medium">{ingredient.availableQty}</p>
+                                </div>
+                                <div className="flex items-center gap-4">
+                                    <Link
+                                        to={`updateingridient/${ingredient._id}?type=${type}`}
+                                        className="text-sec hover:scale-110 transition"
+                                    >
+                                        <FaEdit />
+                                    </Link>
+                                    <button
+                                        onClick={() => handleDelete(ingredient._id, type)}
+                                        className="text-red-400 hover:cursor-pointer hover:scale-110 transition"
+                                    >
+                                        <FaTrashAlt />
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    ))}
+                </div>
+
+
+            </div>
+        </div>
+    );
+
+    return (
+        <div className="bg-lite text-sec px-4 md:px-20 py-16">
+            {/* Intro */}
+            <div className="mb-12 max-w-4xl">
+                <h1 className="text-3xl md:text-5xl font-extrabold leading-tight">Inventory Management</h1>
+            </div>
+
+            <div className="grid grid-cols-1 xl:grid-cols-2 gap-8">
+                {/* Left: base, cheese, sauce */}
+                <div className="space-y-8">
+                    {["base", "cheese", "sauce"].map(
+                        (type) => inventory[type]?.length > 0 && renderTable(type)
+                    )}
+                </div>
+
+                {/* Right: veggies */}
+                <div className="space-y-8">
+                    {inventory["veggie"]?.length > 0 && renderTable("veggie")}
+                </div>
+            </div>
+
+            {/* Fallback */}
             {Object.values(inventory).every((arr) => !arr || arr.length === 0) && (
-                <div className="text-center text-gray-500 mt-10">No inventory data available.</div>
+                <div className="text-center text-lite/80 mt-10 text-sm">
+                    No inventory data available.
+                </div>
             )}
         </div>
     );
