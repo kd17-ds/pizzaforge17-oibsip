@@ -9,7 +9,7 @@ import {
 
 export default function Footer() {
     return (
-        <footer className=" border-t border-sec mt-12 sm:mx-15 px-4 sm:px-6">
+        <footer className=" border-t border-sec sm:mx-15 px-4 sm:px-6">
             <div className="grid grid-cols-1 md:grid-cols-3 items-center  text-center md:text-left py-2">
                 {/* Left Section (Logo) */}
                 <div className="mx-auto md:mx-0 mb-3 mb:0">

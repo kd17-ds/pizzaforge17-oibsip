@@ -92,7 +92,7 @@ export default function Authentication({ formType }) {
 
 
     return (
-        <div className="min-h-[calc(100vh-225px)] pt-[75px] flex items-center justify-center px-4 ">
+        <div className="min-h-[calc(100vh-225px)] pt-[75px] flex items-center justify-center px-4 mb-14">
             <div className="w-full max-w-md bg-white p-8 rounded shadow">
                 <div className="flex flex-col items-center">
                     <div className="bg-sec text-white p-4 rounded-full mb-4">

@@ -45,7 +45,7 @@ export default function VerifyEmail() {
     }, []);
 
     return (
-        <div className="min-h-[calc(100vh-225px)] pt-[75px] flex items-center justify-center px-4 ">
+        <div className="min-h-[calc(100vh-225px)] pt-[75px] flex items-center justify-center px-4 mb-14">
             <div className="bg-white rounded-xl shadow-md p-8 max-w-md w-full flex flex-col items-center text-center">
                 {verified === null && (
                     <p className="text-lg font-semibold text-gray-600">Verifying your email...</p>

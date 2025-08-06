@@ -73,7 +73,7 @@ export default function AddPizzasPage() {
     }
 
     return (
-        <div className="min-h-[calc(100vh-225px)] pt-[50px] flex items-center  justify-center px-4 ">
+        <div className="min-h-[calc(100vh-225px)] pt-[50px] flex items-center  justify-center px-4 py-14">
             <div className="w-full max-w-3xl bg-primary/25 rounded-3xl shadow-xl overflow-hidden border-sec border-2">
                 {/* Header */}
                 <div className=" text-sec text-center py-6 px-4 border-b-2">

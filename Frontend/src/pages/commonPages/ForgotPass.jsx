@@ -40,7 +40,7 @@ export default function ResetPassword() {
     };
 
     return (
-        <div className="min-h-[calc(100vh-225px)] pt-[75px] flex items-center justify-center px-4">
+        <div className="min-h-[calc(100vh-225px)] pt-[75px] flex items-center justify-center px-4 mb-14">
             <form onSubmit={handleSubmit} className="bg-white p-8 rounded-xl shadow-md max-w-md w-full">
                 <h2 className="text-2xl font-bold text-center text-sec mb-6">Reset Your Password</h2>
 

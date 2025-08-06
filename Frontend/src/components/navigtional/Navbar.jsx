@@ -1,8 +1,8 @@
 import React, { useState, useEffect, useRef } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
-import { useAuth } from "../../hooks/useAuth"; // adjust path if needed
+import { useAuth } from "../../hooks/useAuth";
 import axios from "axios";
-import { BASE_URL } from "../../constants/constants"; // adjust path if needed
+import { BASE_URL } from "../../constants/constants";
 
 export default function Navbar() {
     const [isOpen, setIsOpen] = useState(false);
@@ -20,6 +20,9 @@ export default function Navbar() {
         { name: "My Pizzas", path: "/allcustomizedpizza" },
         { name: "Orders", path: "/myorders" },
     ];
+
+    // Add Admin link if user is an admin
+    const finalNavLinks = [...navLinks, ...(user?.isAdmin ? [{ name: "Admin", path: "/admin/home" }] : [])];
 
     const getInitials = (name, username) => {
         const str = name?.trim() || username?.trim() || "";
@@ -149,7 +152,7 @@ export default function Navbar() {
 
                 {/* Desktop Nav */}
                 <div className="hidden md:flex items-center space-x-8 px-4">
-                    {navLinks.map((link, index) => (
+                    {finalNavLinks.map((link, index) => (
                         <NavLink
                             key={index}
                             to={link.path}
@@ -199,7 +202,7 @@ export default function Navbar() {
                     id="mobile-menu"
                     className="md:hidden pt-2 pb-2 text-center bg-lite text-sec shadow-lg"
                 >
-                    {navLinks.map((link, index) => (
+                    {finalNavLinks.map((link, index) => (
                         <NavLink
                             key={index}
                             to={link.path}
