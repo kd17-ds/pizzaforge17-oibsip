@@ -7,6 +7,7 @@ const {
 const bcrypt = require("bcrypt");
 const { sendEmail } = require("../utils/sendEmail.js");
 const jwt = require("jsonwebtoken");
+const CLIENT_URL = process.env.CLIENT_URL || "http://localhost:5173";
 
 module.exports.Signup = async (req, res, next) => {
   try {
@@ -28,7 +29,7 @@ module.exports.Signup = async (req, res, next) => {
     });
 
     const verificationToken = emailVerificationToken(user._id);
-    const verificationUrl = `http://localhost:5173/verifyemail?token=${verificationToken}`;
+    const verificationUrl = `${CLIENT_URL}/verifyemail?token=${verificationToken}`;
 
     await sendEmail(
       user.email,
@@ -130,7 +131,7 @@ module.exports.ForgotPass = async (req, res) => {
     }
 
     const token = createResetToken(user._id);
-    const resetPassUrl = `http://localhost:5173/forgotpass?token=${token}`;
+    const resetPassUrl = `${CLIENT_URL}/forgotpass?token=${token}`;
 
     await sendEmail(
       user.email,

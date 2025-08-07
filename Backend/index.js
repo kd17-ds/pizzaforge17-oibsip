@@ -35,6 +35,9 @@ app.use("/", authRoute);
 app.use("/pizzas", pizzaRoute);
 app.use("/customized-pizzas", customizedPizzasRoute);
 app.use("/orders", orderRoute);
+app.get("*", (req, res) => {
+  res.sendFile(path.join(__dirname, "client", "dist", "index.html"));
+});
 
 main()
   .then((res) => {
