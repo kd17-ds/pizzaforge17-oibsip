@@ -64,7 +64,7 @@ export default function ShowPizzasPage() {
 
         try {
             showLoader();
-            const res = await client.delete(`${BASE_URL}/pizzas/deletepizza/${id}`);
+            const res = await client.delete(`/pizzas/deletepizza/${id}`);
             if (res.status === httpStatus.OK) {
                 const updatedPizzas = pizzas.filter((pizza) => pizza._id !== id);
                 const updatedAll = allPizzas.filter((pizza) => pizza._id !== id);
