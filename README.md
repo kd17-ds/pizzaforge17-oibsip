@@ -31,8 +31,8 @@ To design and develop a fully functional **Pizza Delivery Web Application** usin
 
 ---
 
-## 🎥 Demo Video  
-📹 [Watch on LinkedIn]([https://www.linkedin.com/posts/your-post-link](https://www.linkedin.com/posts/ds17_oasisinfobyte-oibsip-webdevelopment-activity-7359276944074395651-bAhd?utm_source=share&utm_medium=member_desktop&rcm=ACoAAENtVg8BLsyfQrf4tksW7VgmqUhsgz8o-kY))  
+### 🎥 Demo Video  
+📹 [Watch on LinkedIn](https://www.linkedin.com/posts/ds17_oasisinfobyte-oibsip-webdevelopment-activity-7359276944074395651-bAhd?utm_source=share&utm_medium=member_desktop&rcm=ACoAAENtVg8BLsyfQrf4tksW7VgmqUhsgz8o-kY)  
 🕒 Duration: 7 minutes 15 seconds
 
 ---
