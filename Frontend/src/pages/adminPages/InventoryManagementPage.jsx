@@ -40,7 +40,7 @@ export default function InventoryManagementPage() {
         if (!confirm) return;
         try {
             showLoader();
-            const res = await client.delete(`${BASE_URL}/customized-pizzas/deleteingridient/${id}?type=${type}`);
+            const res = await client.delete(`/customized-pizzas/deleteingridient/${id}?type=${type}`);
             if (res.status === httpStatus.OK) {
                 setInventory((prev) => ({
                     ...prev,
