@@ -1,4 +1,3 @@
-// Load environment variables from .env (only in dev mode)
 if (process.env.NODE_ENV != "production") {
   require("dotenv").config();
 }
@@ -16,10 +15,10 @@ const pizzaRoute = require("./routes/PizzasRoutes");
 const orderRoute = require("./routes/OrderRoutes");
 const customizedPizzasRoute = require("./routes/CustomizedPizzaRoutes");
 
-app.use(express.static(path.join(__dirname, "client", "dist"))); // Serve frontend static files (like React build)
-app.set("trust proxy", 1); // For trusting proxies (like when deployed on Render, Vercel, etc.)
+app.use(express.static(path.join(__dirname, "client", "dist")));
+app.set("trust proxy", 1); // For trusting proxies (Render, Vercel, etc.)
 
-// Handle CORS – allows frontend (from another origin) to connect to backend
+// CORS
 app.use(
   cors({
     origin: true,
@@ -31,16 +30,18 @@ app.use(
 app.use(bodyParser.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
-app.use("/", authRoute);
-app.use("/pizzas", pizzaRoute);
-app.use("/customized-pizzas", customizedPizzasRoute);
-app.use("/orders", orderRoute);
-app.get("*", (req, res) => {
+
+app.use("/api", authRoute);
+app.use("/api/pizzas", pizzaRoute);
+app.use("/api/customized-pizzas", customizedPizzasRoute);
+app.use("/api/orders", orderRoute);
+
+app.get(/^\/(?!api).*/, (req, res) => {
   res.sendFile(path.join(__dirname, "client", "dist", "index.html"));
 });
 
 main()
-  .then((res) => {
+  .then(() => {
     console.log("DATABASE CONNECTED");
   })
   .catch((err) => {
