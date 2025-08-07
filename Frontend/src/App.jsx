@@ -20,6 +20,7 @@ import UpdateIngredientForm from './pages/adminPages/UpdateIngredientForm';
 import CartPanel from './components/CartComponent';
 import AdminProtectedRoute from './routes/AdminProtectedRoutes';
 import UserProtectedRoute from './routes/UserProtectedRoutes';
+import NotFoundPage from './pages/commonPages/NotFoundPage';
 
 function App() {
     const location = useLocation();
@@ -146,6 +147,7 @@ function App() {
                     />
 
                 </Route>
+                <Route path="*" element={<NotFoundPage />} />
             </Routes>
 
             {shouldShowCart && (

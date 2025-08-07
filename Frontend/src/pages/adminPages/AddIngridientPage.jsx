@@ -77,14 +77,14 @@ export default function AddIngridientPage() {
     }
 
     return (
-        <div className="max-w-md mx-auto bg-white p-6 rounded-lg shadow-md mt-8">
-            <h2 className="text-2xl font-bold mb-4 capitalize text-center">
+        <div className="max-w-md w-full mx-auto border border-sec rounded-lg p-6 my-14">
+            <h2 className="text-2xl font-bold mb-4 capitalize text-center text-sec">
                 Add {type} Ingredient
             </h2>
 
             <form onSubmit={handleSubmit} className="space-y-4">
                 <div>
-                    <label className="block mb-1 font-medium text-gray-700">Name</label>
+                    <label className="block mb-1 font-medium text-sec">Name</label>
                     <input
                         type="text"
                         name="name"
@@ -96,7 +96,7 @@ export default function AddIngridientPage() {
                 </div>
 
                 <div>
-                    <label className="block mb-1 font-medium text-gray-700">Price (₹)</label>
+                    <label className="block mb-1 font-medium text-sec">Price (₹)</label>
                     <input
                         type="number"
                         name="price"
@@ -108,7 +108,7 @@ export default function AddIngridientPage() {
                 </div>
 
                 <div>
-                    <label className="block mb-1 font-medium text-gray-700">Available Quantity</label>
+                    <label className="block mb-1 font-medium text-sec">Available Quantity</label>
                     <input
                         type="number"
                         name="availableQty"
@@ -125,14 +125,14 @@ export default function AddIngridientPage() {
                         name="isAvailable"
                         checked={formData.isAvailable}
                         onChange={handleChange}
-                        className="w-4 h-4"
+                        className="w-4 h-4 accent-[var(--color-secondary)]"
                     />
-                    <label className="text-gray-700">Is Available?</label>
+                    <label className="text-sec">Is Available?</label>
                 </div>
 
                 <button
                     type="submit"
-                    className="w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700"
+                    className="w-full bg-sec text-white py-2 px-4 rounded-md hover:bg-[var(--color-primary)] hover:cursor-pointer"
                 >
                     Add Ingredient
                 </button>
